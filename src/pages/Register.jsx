@@ -74,8 +74,8 @@ const Register = () => {
   return (
     <>
       <form
-        classaction=""
-        className="bg-blue-900 rounded-xl my-6 md:my-12 xl:my-20 w-max shadow-lg mx-auto"
+        action=""
+        className="bg-blue-900 rounded-xl my-1 md:my-2 xl:my-4 w-full sm:w-full md:w-full lg:w-7/8 xl:w-3/4 2xl:w-max 2xl:max-w-xl mx-auto p-8 shadow-lg"
         onSubmit={handleSubmit}
       >
         <Alerta alerta={alerta} />
@@ -128,7 +128,7 @@ const Register = () => {
         <input
           type="submit"
           value="Crear Cuenta"
-          className="bg-white my-5 mx-40 rounded-xl font-normal mt-5 w-64 h-10 hover:cursor-pointer hover:bg-gray-200"
+          className="bg-white my-5 mx-auto w-full h-10 rounded-xl font-normal mt-5 hover:cursor-pointer hover:bg-gray-200"
         />
 
         <nav className="mt-5 lg:flex lg:justify-between my-5 mx-5 underline">
