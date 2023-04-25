@@ -114,7 +114,7 @@ const Register = () => {
 
         <div className="my-10 mx-5">
           <label className="text-white block text-xl font-bold">
-            VerficacionContraseña
+            Verficacion Contraseña
           </label>
           <input
             type="password"

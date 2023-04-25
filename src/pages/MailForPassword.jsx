@@ -4,8 +4,6 @@ import Alerta from "../components/Alerta";
 import axios from "axios";
 const MailForPassword = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repetirPassword, setPasswordConfirm] = useState("");
   const [alerta, setAlerta] = useState({});
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
@@ -54,7 +52,7 @@ const MailForPassword = () => {
     >
       <Alerta alerta={alerta} />
       <div className="my-5 mx-5">
-        <label className="text-white block text-xl font-bold">Email</label>
+        <label className="text-white block text-xl font-bold">E-mail</label>
         <input
           type="email"
           placeholder="Introduce tu e-mail"
@@ -63,32 +61,12 @@ const MailForPassword = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
-      <div className="my-5 mx-5">
-        <label className="text-white block text-xl font-bold">Contraseña</label>
-        <input
-          type="password"
-          placeholder="Introduce tu nueva contraseña"
-          className="border w-full p-3 mt-3 rounded-xl"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <div className="my-5 mx-5">
-        <label className="text-white block text-xl font-bold">
-          Confirmar Contraseña
-        </label>
-        <input
-          type="password"
-          placeholder="Confirma tu nueva contraseña"
-          className="border w-full p-3 mt-3 rounded-xl"
-          value={repetirPassword}
-          onChange={(e) => setPasswordConfirm(e.target.value)}
-        />
-      </div>
+      
+
 
       <input
         type="submit"
-        value="Cambiar contraseña"
+        value="Enviar instrucciones"
         className="bg-white my-5 mx-40 rounded-xl font-normal mt-5 w-64 h-10 hover:cursor-pointer hover:bg-gray-200"
       />
 
