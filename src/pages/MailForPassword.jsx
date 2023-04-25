@@ -8,7 +8,7 @@ const MailForPassword = () => {
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password || !repetirPassword) {
+  /*  if (!email || !password || !repetirPassword) {
       setAlerta({ msg: "Se requiere correo electrónico y nueva contraseña" });
       return;
     }
@@ -41,7 +41,7 @@ const MailForPassword = () => {
       } else {
         setAlerta({ msg: "Error al cambiar la contraseña" });
       }
-    }
+    } */
   };
 
   return (
