@@ -1,61 +1,100 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import Alerta from "../components/Alerta"
-
-
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Alerta from "../components/Alerta";
+import axios from "axios";
 
 const Login = () => {
-  const [nombre, getNombre] = useState('')
-  const [password, getPassword] = useState('')
+  const [nombre, getNombre] = useState("");
+  const [password, getPassword] = useState("");
 
-  const [alerta, setAlerta] = useState({})
+  const [alerta, setAlerta] = useState({});
 
-  const handleSubmit = async e => {
-    e.preventDefault()
-    if ([nombre,password].includes('')) {
-        setAlerta({msg:'Hay valores vacios'})
-        console.log("Hay valores vacios")
-        return;
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if ([nombre, password].includes("")) {
+      setAlerta({ msg: "Hay valores vacios" });
+      console.log("Hay valores vacios");
+      return;
     }
-    setAlerta({msg:'Todo bien'})
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/psychologists/login",
+        {
+          email: nombre,
+          password: password,
+        }
+      );
 
-  }
-
+      if (response.data.token) {
+        // Guarda el token en el almacenamiento local
+        localStorage.setItem("token", response.data.token);
+        setAlerta({ msg: "Inicio de sesión exitoso" });
+        navigate("/home");
+      } else {
+        setAlerta({ msg: "Error al iniciar sesión" });
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.response && error.response.data) {
+        // Muestra un mensaje de error específico desde el backend
+        setAlerta({ msg: error.response.data.error });
+      } else {
+        setAlerta({ msg: "Error al iniciar sesión" });
+      }
+    }
+  };
 
   return (
     <>
-            <form classaction="" className="bg-blue-900 rounded-xl my-56 w-max shadow-lg" onSubmit={handleSubmit}>
-                <Alerta alerta = {alerta}/>
-                <div className="my-10 mx-5">
-                    <label className="text-white block text-xl font-bold">
-                        E-mail
-                    </label>
-                    <input type="email" placeholder="Introduce tu e-mail" className="border w-full p-3 mt-3 rounded-xl" value={nombre} onChange={ e=> getNombre(e.target.value)}/>
-                    
-                </div>
-                <div className="my-5 mx-5">
-                    <label className="text-white block text-xl font-bold">
-                        Contraseña
-                    </label>
-                    <input type="password" placeholder="Introduce tu contraseña" className="border w-full p-3 mt-3 rounded-xl" value={password} onChange={ e=> getPassword(e.target.value)}/>
-                </div>
-                    
-                <input type="submit" value= "Iniciar Sesión" className="bg-white my-5 mx-40 rounded-xl font-normal mt-5 w-64 h-10 hover:cursor-pointer hover:bg-gray-200"/>
-               
-            <nav className="mt-5 lg:flex lg:justify-between my-5 mx-5 underline">
-                <Link className="block text-center text-white" to="/register">
-                    No tienes una cuenta? <span className=" hover:cursor-pointer">Registrate</span>
-                </Link>
-                <Link className="block text-center text-white" to="/restore-account">
-                    Olvide mi contraseña
-                </Link>
-            </nav>
-                
-            </form>
+      <form
+        classaction=""
+        className="bg-blue-900 rounded-xl my-6 md:my-12 xl:my-20 w-max shadow-lg mx-auto"
+        onSubmit={handleSubmit}
+      >
+        <Alerta alerta={alerta} />
+        <div className="my-10 mx-5">
+          <label className="text-white block text-xl font-bold">E-mail</label>
+          <input
+            type="email"
+            placeholder="Introduce tu e-mail"
+            className="border w-full p-3 mt-3 rounded-xl"
+            value={nombre}
+            onChange={(e) => getNombre(e.target.value)}
+          />
+        </div>
+        <div className="my-5 mx-5">
+          <label className="text-white block text-xl font-bold">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            placeholder="Introduce tu contraseña"
+            className="border w-full p-3 mt-3 rounded-xl"
+            value={password}
+            onChange={(e) => getPassword(e.target.value)}
+          />
+        </div>
 
+        <input
+          type="submit"
+          value="Iniciar Sesión"
+          className="bg-white my-5 mx-40 rounded-xl font-normal mt-5 w-64 h-10 hover:cursor-pointer hover:bg-gray-200"
+        />
 
+        <nav className="mt-5 lg:flex lg:justify-between my-5 mx-5 underline">
+          <Link className="block text-center text-white" to="/register">
+            No tienes una cuenta?{" "}
+            <span className=" hover:cursor-pointer">Registrate</span>
+          </Link>
+          <Link className="block text-center text-white" to="/restore-account">
+            Olvide mi contraseña
+          </Link>
+        </nav>
+      </form>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
