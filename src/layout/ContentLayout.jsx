@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -64,6 +64,10 @@ const useStyles = makeStyles((theme) => ({
 
 const ContentLayout = () => {
   const classes = useStyles();
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/" />;
+  }
   const [openCitas, setOpenCitas] = React.useState(false);
   const [openPacientes, setOpenPacientes] = React.useState(false);
   const [openHistorias, setOpenHistorias] = React.useState(false);
