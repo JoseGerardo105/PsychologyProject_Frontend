@@ -12,7 +12,7 @@ function RegisterPatient() {
         className="bg-gray-300 rounded-xl my-1 md:my-2 xl:my-4 w-full sm:w-full md:w-full lg:w-7/8 xl:w-3/4 2xl:w-max 2xl:max-w-xl mx-auto p-8 shadow-lg"
       >
         <div>
-          <h1 className="text-black block text-6xl font-bold text-center ">Registrar Paciente</h1>
+          <h1 className="text-black block text-6xl font-bold text-center ">Registro Paciente</h1>
         </div>
         <div className="my-10 mx-5">
           <label className="text-black block text-xl font-bold">Nombre</label>
