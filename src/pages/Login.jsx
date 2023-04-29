@@ -14,7 +14,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if ([nombre, password].includes("")) {
-      setAlerta({ msg: "Hay valores vacios" });
+      setAlerta({ msg: "Hay valores vacios", err: true  });
       console.log("Hay valores vacios");
       return;
     }
@@ -45,6 +45,7 @@ const Login = () => {
       }
     }
   };
+  const { msg } = alerta;
 
   return (
     <>
@@ -53,7 +54,9 @@ const Login = () => {
         className="bg-blue-900 rounded-xl my-1 md:my-2 xl:my-4 w-full sm:w-full md:w-full lg:w-7/8 xl:w-3/4 2xl:w-max 2xl:max-w-xl mx-auto p-8 shadow-lg"
         onSubmit={handleSubmit}
       >
-        <Alerta alerta={alerta} />
+
+        {msg && <Alerta alerta={alerta} />}
+        
         <div className="my-10 mx-5">
           <label className="text-white block text-xl font-bold">E-mail</label>
           <input
