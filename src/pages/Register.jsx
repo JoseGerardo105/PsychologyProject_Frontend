@@ -20,19 +20,19 @@ const Register = () => {
     console.log(password);
     console.log(repetirPassword);
     if ([nombre, email, password, repetirPassword].includes("")) {
-      setAlerta({ msg: "Hay valores vacios" });
+      setAlerta({ msg: "Hay valores vacios", err: true });
       console.log("Hay valores vacios");
       return;
     }
 
     if (password !== repetirPassword) {
-      setAlerta({ msg: "Las contraseñas no coinciden. " });
+      setAlerta({ msg: "Las contraseñas no coinciden. ", err: true });
       console.log("Las contraseñas no coinciden.");
       return;
     }
     if (password.length < 8) {
       setAlerta({
-        msg: "La contraseña no es lo suficientemente larga. Tiene que tener minimo 8 caracteres",
+        msg: "La contraseña no es lo suficientemente larga. Tiene que tener minimo 8 caracteres", err: true
       });
       console.log(
         "La contraseña no es lo suficientemente larga. Tiene que tener minimo 8 caracteres"
@@ -40,7 +40,7 @@ const Register = () => {
       return;
     }
 
-    setAlerta({ msg: "datos correctos" });
+    setAlerta({ msg: "datos correctos" , err: false});
 
     try {
       const response = await axios.post(
@@ -53,10 +53,10 @@ const Register = () => {
       );
 
       if (response.data.message) {
-        setAlerta({ msg: "Cuenta creada exitosamente" });
+        setAlerta({ msg: "Cuenta creada exitosamente" , err: false});
         navigate("/");
       } else {
-        setAlerta({ msg: "Error al crear cuenta" });
+        setAlerta({ msg: "Error al crear cuenta" , err: true});
       }
     } catch (error) {
       console.log(error);
@@ -64,7 +64,7 @@ const Register = () => {
         // Muestra un mensaje de error específico del back
         setAlerta({ msg: error.response.data.error });
       } else {
-        setAlerta({ msg: "Error al crear cuenta" });
+        setAlerta({ msg: "Error al crear cuenta" , err: true});
       }
     }
   };

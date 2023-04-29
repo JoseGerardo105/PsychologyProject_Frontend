@@ -21,6 +21,7 @@ import {
   Add,
   Search,
 } from "@material-ui/icons";
+import { Link } from "react-router-dom";
 
 const styles = { fontFamily: "Oleo Script", fontSize: "3.4rem" };
 
@@ -153,22 +154,29 @@ const ContentLayout = () => {
               {" "}
               <List component="div" disablePadding>
                 {" "}
-                <ListItem button className={classes.nested}>
-                  {" "}
-                  <ListItemIcon className={classes.icon}>
-                    {" "}
-                    <Add />{" "}
-                  </ListItemIcon>{" "}
-                  <ListItemText primary="Registrar Paciente" />{" "}
-                </ListItem>{" "}
-                <ListItem button className={classes.nested}>
-                  {" "}
-                  <ListItemIcon className={classes.icon}>
-                    {" "}
-                    <Search />{" "}
-                  </ListItemIcon>{" "}
-                  <ListItemText primary="Buscar Paciente" />{" "}
-                </ListItem>{" "}
+                <nav>
+                  <Link to="/home/register-patients">
+                    <ListItem button className={classes.nested}>
+                      {" "}
+                      <ListItemIcon className={classes.icon}>
+                        {" "}
+                        <Add />{" "}
+                      </ListItemIcon>{" "}
+                      <ListItemText primary="Registrar Paciente" />{" "}
+                    </ListItem>{" "}
+                  </Link>
+
+                  <Link to="/home/search-patients">
+                    <ListItem button className={classes.nested}>
+                      {" "}
+                      <ListItemIcon className={classes.icon}>
+                        {" "}
+                        <Search />{" "}
+                      </ListItemIcon>{" "}
+                      <ListItemText primary="Buscar Paciente" />{" "}
+                    </ListItem>{" "}
+                  </Link>
+                </nav>
               </List>{" "}
             </Collapse>{" "}
             <ListItem button onClick={handleClickHistorias}>
@@ -187,57 +195,71 @@ const ContentLayout = () => {
               {" "}
               <List component="div" disablePadding>
                 {" "}
-                <ListItem button className={classes.nested}>
-                  {" "}
-                  <ListItemIcon className={classes.icon}>
-                    {" "}
-                    <Add />{" "}
-                  </ListItemIcon>{" "}
-                  <ListItemText primary="Crear Historia" />{" "}
-                </ListItem>{" "}
-                <ListItem button className={classes.nested}>
-                  {" "}
-                  <ListItemIcon className={classes.icon}>
-                    {" "}
-                    <Search />{" "}
-                  </ListItemIcon>{" "}
-                  <ListItemText primary="Buscar Historia" />{" "}
-                </ListItem>{" "}
+                <nav>
+                  <Link to="/home/create-history">
+                    <ListItem button className={classes.nested}>
+                      {" "}
+                      <ListItemIcon className={classes.icon}>
+                        {" "}
+                        <Add />{" "}
+                      </ListItemIcon>{" "}
+                      <ListItemText primary="Crear Historia" />{" "}
+                    </ListItem>{" "}
+                  </Link>
+                  <Link to="/home/search-history">
+                    <ListItem button className={classes.nested}>
+                      {" "}
+                      <ListItemIcon className={classes.icon}>
+                        {" "}
+                        <Search />{" "}
+                      </ListItemIcon>{" "}
+                      <ListItemText primary="Buscar Historia" />{" "}
+                    </ListItem>{" "}
+                  </Link>
+                </nav>
               </List>{" "}
             </Collapse>{" "}
-            <ListItem button>
-              {" "}
-              <ListItemIcon className={classes.icon}>
-                {" "}
-                <Assessment />{" "}
-              </ListItemIcon>{" "}
-              <ListItemText
-                primary="Reportes"
-                classes={{ primary: classes.mainMenuItemText }}
-              />{" "}
-            </ListItem>{" "}
-            <ListItem button>
-              {" "}
-              <ListItemIcon className={classes.icon}>
-                {" "}
-                <AccountCircle />{" "}
-              </ListItemIcon>{" "}
-              <ListItemText
-                primary="Mi Perfil"
-                classes={{ primary: classes.mainMenuItemText }}
-              />{" "}
-            </ListItem>{" "}
-            <ListItem button>
-              {" "}
-              <ListItemIcon className={classes.icon}>
-                {" "}
-                <ExitToApp />{" "}
-              </ListItemIcon>{" "}
-              <ListItemText
-                primary="Salir"
-                classes={{ primary: classes.mainMenuItemText }}
-              />{" "}
-            </ListItem>{" "}
+            <nav>
+              <Link to="/home/stats">
+                <ListItem button>
+                  {" "}
+                  <ListItemIcon className={classes.icon}>
+                    {" "}
+                    <Assessment />{" "}
+                  </ListItemIcon>{" "}
+                  <ListItemText
+                    primary="Reportes"
+                    classes={{ primary: classes.mainMenuItemText }}
+                  />{" "}
+                </ListItem>{" "}
+              </Link>
+              <Link to="/home/my-profile">
+                <ListItem button>
+                  {" "}
+                  <ListItemIcon className={classes.icon}>
+                    {" "}
+                    <AccountCircle />{" "}
+                  </ListItemIcon>{" "}
+                  <ListItemText
+                    primary="Mi Perfil"
+                    classes={{ primary: classes.mainMenuItemText }}
+                  />{" "}
+                </ListItem>{" "}
+              </Link>
+              <Link to="/">
+                <ListItem button>
+                  {" "}
+                  <ListItemIcon className={classes.icon}>
+                    {" "}
+                    <ExitToApp />{" "}
+                  </ListItemIcon>{" "}
+                  <ListItemText
+                    primary="Salir"
+                    classes={{ primary: classes.mainMenuItemText }}
+                  />{" "}
+                </ListItem>{" "}
+              </Link>
+            </nav>
           </List>{" "}
         </Drawer>{" "}
         <main className={classes.content}>

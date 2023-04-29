@@ -30,18 +30,18 @@ const Login = () => {
       if (response.data.token) {
         // Guarda el token en el almacenamiento local
         localStorage.setItem("token", response.data.token);
-        setAlerta({ msg: "Inicio de sesión exitoso" });
+        setAlerta({ msg: "Inicio de sesión exitoso", err: false });
         navigate("/home");
       } else {
-        setAlerta({ msg: "Error al iniciar sesión" });
+        setAlerta({ msg: "Error al iniciar sesión", err: true });
       }
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico desde el backend
-        setAlerta({ msg: error.response.data.error });
+        setAlerta({ msg: error.response.data.error, err: true });
       } else {
-        setAlerta({ msg: "Error al iniciar sesión" });
+        setAlerta({ msg: "Error al iniciar sesión", err: true });
       }
     }
   };
