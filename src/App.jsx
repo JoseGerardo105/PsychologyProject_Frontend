@@ -13,6 +13,7 @@ import SearchHistory from "./pages/SearchHistory";
 import MyProfile from "./pages/MyProfile";
 import Reports from "./pages/Reports";
 import ConfirmAccount from "./pages/ConfirmAccount";
+import ChangePasswordInAccount from "./pages/ChangePasswordInAccount";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="search-history" element={<SearchHistory />} />{" "}
           <Route path="my-profile" element={<MyProfile />} />{" "}
           <Route path="stats" element={<Reports />} />{" "}
+          <Route path="change-password" element={<ChangePasswordInAccount />} />{" "}
         </Route>{" "}
       </Routes>{" "}
     </BrowserRouter>

@@ -98,10 +98,19 @@ const ContentLayout = () => {
         {" "}
         <header className={classes.header}>
           {" "}
+          <nav>
+            <Link to="/home">
           <h1 style={{ ...styles, fontSize: "2rem" }}>
             {" "}
             <span className="text-indigo-900">Psy</span>nergia{" "}
           </h1>{" "}
+
+
+            </Link>
+          </nav>
+
+
+
         </header>{" "}
         <Drawer
           className={classes.drawer}
