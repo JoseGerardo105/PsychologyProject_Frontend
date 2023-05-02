@@ -100,17 +100,12 @@ const ContentLayout = () => {
           {" "}
           <nav>
             <Link to="/home">
-          <h1 style={{ ...styles, fontSize: "2rem" }}>
-            {" "}
-            <span className="text-indigo-900">Psy</span>nergia{" "}
-          </h1>{" "}
-
-
+              <h1 style={{ ...styles, fontSize: "2rem" }}>
+                {" "}
+                <span className="text-indigo-900">Psy</span>nergia{" "}
+              </h1>{" "}
             </Link>
           </nav>
-
-
-
         </header>{" "}
         <Drawer
           className={classes.drawer}
@@ -137,14 +132,18 @@ const ContentLayout = () => {
               {" "}
               <List component="div" disablePadding>
                 {" "}
-                <ListItem button className={classes.nested}>
-                  {" "}
-                  <ListItemIcon className={classes.icon}>
-                    {" "}
-                    <Add />{" "}
-                  </ListItemIcon>{" "}
-                  <ListItemText primary="Agendar Cita" />{" "}
-                </ListItem>{" "}
+                <nav>
+                  <Link to="/home">
+                    <ListItem button className={classes.nested}>
+                      {" "}
+                      <ListItemIcon className={classes.icon}>
+                        {" "}
+                        <Add />{" "}
+                      </ListItemIcon>{" "}
+                      <ListItemText primary="Agendar Cita" />{" "}
+                    </ListItem>{" "}
+                  </Link>
+                </nav>
               </List>{" "}
             </Collapse>{" "}
             <ListItem button onClick={handleClickPacientes}>
