@@ -140,7 +140,7 @@ const ContentLayout = () => {
                         {" "}
                         <Add />{" "}
                       </ListItemIcon>{" "}
-                      <ListItemText primary="Agendar Cita" />{" "}
+                      <ListItemText primary="Mis Citas" />{" "}
                     </ListItem>{" "}
                   </Link>
                 </nav>

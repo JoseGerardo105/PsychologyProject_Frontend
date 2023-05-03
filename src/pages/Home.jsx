@@ -74,8 +74,8 @@ class Home extends React.Component {
         );
         // Utiliza el nombre del paciente en el título del evento
         const title = patient
-          ? `Cita con paciente ${patient.name}`
-          : `Cita con paciente ${appointment.patient_id}`;
+          ? `Cita con  ${patient.name}`
+          : `Cita con  ${appointment.patient_id}`;
 
         return {
           id: appointment.id,
@@ -136,7 +136,29 @@ class Home extends React.Component {
       showAppointmentForm: true,
     });
   };
+  handleEventDrop = async (info) => {
+    const newStartTime = info.event.start.toISOString();
+    const newEndTime = info.event.end.toISOString();
+    const eventId = info.event.id;
+    const status = info.event.extendedProps.status;
+    const notes = info.event.extendedProps.notes;
+    const price_cop = info.event.extendedProps.price_cop;
 
+    try {
+      await axios.patch(
+        `http://localhost:4000/api/psychologists/update-appointment/${eventId}`,
+        {
+          start_time: newStartTime,
+          end_time: newEndTime,
+          status,
+          notes,
+          price_cop,
+        }
+      );
+    } catch (error) {
+      console.error("Error al actualizar la cita:", error);
+    }
+  };
   handleCloseAppointmentForm = () => {
     this.setState({
       showAppointmentForm: false,
@@ -174,7 +196,7 @@ class Home extends React.Component {
     const calendarApi = this.calendarRef.current.getApi();
     const newEvent = {
       id: createEventId(),
-      title: `Cita con paciente ${patientId.name}`,
+      title: `Cita con ${patientId.name}`,
       start,
       end,
       allDay,
@@ -231,6 +253,7 @@ class Home extends React.Component {
           weekends={this.state.weekendsVisible}
           events={currentEvents}
           select={this.handleDateSelect}
+          eventDrop={this.handleEventDrop}
           eventContent={renderEventContent}
           eventClick={this.handleEventClick}
           eventDidMount={this.handleEventDidMount}
