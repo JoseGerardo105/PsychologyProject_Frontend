@@ -6,7 +6,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import { makeStyles } from "@material-ui/core/styles";
 import { formatDate } from "@fullcalendar/core";
-import { INITIAL_EVENTS, createEventId } from "../event-utils";
 import esLocale from "@fullcalendar/core/locales/es";
 import AppointmentForm from "../components/AppointmentForm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
@@ -33,13 +32,34 @@ class Home extends React.Component {
     showAppointmentForm: false,
     selectedDate: null,
     patients: [],
+    psychologists: [],
     appointments: [],
   };
 
   componentDidMount() {
-    this.fetchPatients();
-    this.fetchAppointments();
+    Promise.all([this.fetchPatients(), this.fetchPsychologists()]).then(() => {
+      this.fetchAppointments();
+    });
   }
+
+  handleEventDidMount = (eventInfo) => {
+    const status = eventInfo.event.extendedProps.status;
+    const eventElement = eventInfo.el;
+
+    switch (status) {
+      case "active":
+        eventElement.style.backgroundColor = "#130663";
+        break;
+      case "in_progress":
+        eventElement.style.backgroundColor = "green";
+        break;
+      case "cancelled":
+        eventElement.style.backgroundColor = "red";
+        break;
+      default:
+        break;
+    }
+  };
 
   fetchAppointments = async () => {
     try {
@@ -47,11 +67,30 @@ class Home extends React.Component {
         "http://localhost:4000/api/psychologists/get-appointments"
       );
       const appointments = response.data;
-      this.setState({ appointments });
+      const calendarEvents = appointments.map((appointment) => {
+        // Encuentra el paciente correspondiente al patient_id
+        const patient = this.state.patients.find(
+          (p) => p.id === appointment.patient_id
+        );
+        // Utiliza el nombre del paciente en el título del evento
+        const title = patient
+          ? `Cita con paciente ${patient.name}`
+          : `Cita con paciente ${appointment.patient_id}`;
+
+        return {
+          id: appointment.id,
+          title,
+          start: new Date(appointment.start_time),
+          end: new Date(appointment.end_time),
+          status: appointment.status,
+        };
+      });
+      this.setState({ currentEvents: calendarEvents });
     } catch (error) {
       console.error("Error al obtener las citas:", error);
     }
   };
+
   fetchPatients = async () => {
     try {
       const response = await axios.get(
@@ -59,8 +98,22 @@ class Home extends React.Component {
       );
       const patients = response.data;
       this.setState({ patients });
+      return patients;
     } catch (error) {
       console.error("Error al obtener los pacientes:", error);
+    }
+  };
+
+  fetchPsychologists = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:4000/api/psychologists/get-psychologists"
+      );
+      const psychologists = response.data;
+      this.setState({ psychologists });
+      return psychologists;
+    } catch (error) {
+      console.error("Error al obtener los Psicólogos:", error);
     }
   };
 
@@ -91,33 +144,59 @@ class Home extends React.Component {
     });
   };
 
-  handleCreateAppointment = (formData) => {
-    const { patientId, start, end, allDay } = formData;
-
+  handleCreateAppointment = async (formData) => {
+    const {
+      patientId,
+      psychologistId,
+      start,
+      end,
+      allDay,
+      status,
+      notes,
+      price_cop,
+    } = formData;
+    try {
+      await axios.post(
+        "http://localhost:4000/api/psychologists/create-appointment",
+        {
+          patient_id: patientId.name,
+          psychologist_id: psychologistId.name,
+          start_time: start,
+          end_time: end,
+          status: status,
+          notes: notes,
+          price_cop: price_cop,
+        }
+      );
+    } catch (error) {
+      console.error("Error al crear la cita:", error);
+    }
     const calendarApi = this.calendarRef.current.getApi();
-    calendarApi.addEvent({
+    const newEvent = {
       id: createEventId(),
       title: `Cita con paciente ${patientId.name}`,
       start,
       end,
       allDay,
+      status,
+      notes,
+      price_cop,
+    };
+    calendarApi.addEvent(newEvent);
+
+    this.setState({
+      currentEvents: [...this.state.currentEvents, newEvent],
     });
   };
 
   handleEventClick = (clickInfo) => {
     if (
       confirm(
-        `¿Estás seguro de que deseas eliminar este evento? '${clickInfo.event.title}'`
+        `¿Estás seguro de que deseas eliminar este evento? ${clickInfo.event.title}`
       )
     ) {
       clickInfo.event.remove();
     }
-  };
-
-  handleEvents = (events) => {
-    this.setState({
-      currentEvents: events,
-    });
   };
 
   handleLenguageChange = () => {
@@ -128,12 +207,7 @@ class Home extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const calendarEvents = this.state.appointments.map((appointment) => ({
-      id: appointment.id,
-      title: `Cita con paciente ${appointment.patient_id}`,
-      start: appointment.start_time,
-      end: appointment.end_time,
-    }));
+    const { currentEvents } = this.state;
     return (
       <div className={classes.homeContainer}>
         <FullCalendar
@@ -155,13 +229,15 @@ class Home extends React.Component {
           selectMirror={true}
           dayMaxEvents={true}
           weekends={this.state.weekendsVisible}
-          //initialEvents={calendarEvents}
-          initialEvents={INITIAL_EVENTS}
+          events={currentEvents}
           select={this.handleDateSelect}
           eventContent={renderEventContent}
           eventClick={this.handleEventClick}
-          eventsSet={this.handleEvents}
-          height={"80vh"}
+          eventDidMount={this.handleEventDidMount}
+          //eventColor="#130663"
+          eventTextColor="#FFFFFF"
+          eventBorderColor="#000000"
+          height={"100vh"}
           locales={[esLocale]}
           locale={this.state.locale}
 
@@ -181,6 +257,7 @@ class Home extends React.Component {
               selectedEnd={this.state.selectedEnd}
               allDay={this.state.allDay}
               patients={this.state.patients}
+              psycologists={this.state.psychologists}
             />
           </MuiPickersUtilsProvider>
         )}
@@ -190,26 +267,27 @@ class Home extends React.Component {
 }
 
 function renderEventContent(eventInfo) {
-  return (
-    <>
-      <b>{eventInfo.timeText}</b>
-      <i>{eventInfo.event.title}</i>
-    </>
-  );
-}
+  // Formatear la fecha y hora de inicio y finalización
+  const startTime = formatDate(eventInfo.event.start, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+  const endTime = formatDate(eventInfo.event.end, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
 
-function renderSidebarEvent(event) {
   return (
-    <li key={event.id}>
-      <b>
-        {formatDate(event.start, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })}
-      </b>
-      <i>{event.title}</i>
-    </li>
+    <div style={{ color: "white", fontSize: "0.6rem" }}>
+      <div>
+        <b>{`${startTime} - ${endTime}`}</b>
+      </div>
+      <div>
+        <i>{eventInfo.event.title}</i>
+      </div>
+    </div>
   );
 }
 
