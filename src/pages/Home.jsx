@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, alpha } from "@material-ui/core/styles";
 import { formatDate } from "@fullcalendar/core";
 import esLocale from "@fullcalendar/core/locales/es";
 import AppointmentForm from "../components/AppointmentForm";
@@ -67,6 +67,7 @@ class Home extends React.Component {
         "http://localhost:4000/api/psychologists/get-appointments"
       );
       const appointments = response.data;
+      console.log("Citas Cargadas cargados: ", appointments);
       const calendarEvents = appointments.map((appointment) => {
         // Encuentra el paciente correspondiente al patient_id
         const patient = this.state.patients.find(
@@ -98,6 +99,7 @@ class Home extends React.Component {
       );
       const patients = response.data;
       this.setState({ patients });
+      console.log("Pacientes cargados: ", patients);
       return patients;
     } catch (error) {
       console.error("Error al obtener los pacientes:", error);
@@ -111,6 +113,7 @@ class Home extends React.Component {
       );
       const psychologists = response.data;
       this.setState({ psychologists });
+      console.log("Psicologos cargados: ", psychologists);
       return psychologists;
     } catch (error) {
       console.error("Error al obtener los Psicólogos:", error);
@@ -130,6 +133,7 @@ class Home extends React.Component {
     calendarApi.unselect(); // clear date selection
 
     this.setState({
+      selectedEvent: null,
       selectedDate: selectInfo.startStr,
       selectedEnd: selectInfo.endStr,
       allDay: selectInfo.allDay,
@@ -181,8 +185,8 @@ class Home extends React.Component {
       await axios.post(
         "http://localhost:4000/api/psychologists/create-appointment",
         {
-          patient_id: patientId.name,
-          psychologist_id: psychologistId.name,
+          patient_id: patientId.id,
+          psychologist_id: psychologistId.id,
           start_time: start,
           end_time: end,
           status: status,
@@ -195,7 +199,6 @@ class Home extends React.Component {
     }
     const calendarApi = this.calendarRef.current.getApi();
     const newEvent = {
-      id: createEventId(),
       title: `Cita con ${patientId.name}`,
       start,
       end,
@@ -211,14 +214,86 @@ class Home extends React.Component {
     });
   };
 
-  handleEventClick = (clickInfo) => {
-    if (
-      confirm(
-        `¿Estás seguro de que deseas eliminar este evento? ${clickInfo.event.title}`
-      )
-    ) {
-      clickInfo.event.remove();
+  handleDeleteAppointment = async (selectedEvent) => {
+    const eventId = selectedEvent.id;
+
+    try {
+      await axios.delete(
+        `http://localhost:4000/api/psychologists/delete-appointment/${eventId}`
+      );
+    } catch (error) {
+      console.error("Error al eliminar la cita:", error);
     }
+
+    const calendarApi = this.calendarRef.current.getApi();
+    selectedEvent.remove();
+  };
+
+  handleUpdateAppointment = async (selectedEvent, updatedData) => {
+    const eventId = selectedEvent.id;
+    try {
+      await axios.patch(
+        `http://localhost:4000/api/psychologists/update-appointment-form/${eventId}`,
+        {
+          start_time: updatedData.start,
+          end_time: updatedData.end,
+          status: updatedData.status,
+          notes: updatedData.notes,
+          price_cop: updatedData.price_cop,
+        }
+      );
+    } catch (error) {
+      console.error("Error al actualizar la cita:", error);
+    }
+    const calendarApi = this.calendarRef.current.getApi();
+    selectedEvent.setProp(
+      "title",
+      `Cita con paciente ${updatedData.patient.name}`
+    );
+    selectedEvent.setStart(updatedData.start);
+    selectedEvent.setEnd(updatedData.end);
+    selectedEvent.setExtendedProp("status", updatedData.status);
+    selectedEvent.setExtendedProp("notes", updatedData.notes);
+    selectedEvent.setExtendedProp("price_cop", updatedData.price_cop);
+    calendarApi.updateEvent(selectedEvent);
+  };
+
+  handleUpdateAppointmentWithButton = async (selectedEvent, updatedData) => {
+    const eventId = selectedEvent.id;
+    try {
+      await axios.patch(
+        `http://localhost:4000/api/psychologists/update-appointment/${eventId}`,
+        {
+          start_time: updatedData.start,
+          end_time: updatedData.end,
+          status: updatedData.status,
+          notes: updatedData.notes,
+          price_cop: updatedData.price_cop,
+        }
+      );
+    } catch (error) {
+      console.error("Error al actualizar la cita:", error);
+    }
+    const calendarApi = this.calendarRef.current.getApi();
+    selectedEvent.setProp(
+      "title",
+      `Cita con paciente ${updatedData.patient?.name}`
+    );
+    selectedEvent.setStart(updatedData.start);
+    selectedEvent.setEnd(updatedData.end);
+    selectedEvent.setExtendedProp("status", updatedData.status);
+    selectedEvent.setExtendedProp("notes", updatedData.notes);
+    selectedEvent.setExtendedProp("price_cop", updatedData.price_cop);
+    calendarApi.refetchEvents();
+  };
+
+  handleEventClick = (clickInfo) => {
+    this.setState({
+      selectedEvent: clickInfo.event,
+      selectedDate: clickInfo.event.start.toISOString(),
+      selectedEnd: clickInfo.event.end.toISOString(),
+      showAppointmentForm: true,
+    });
   };
 
   handleLenguageChange = () => {
@@ -231,59 +306,59 @@ class Home extends React.Component {
     const { classes } = this.props;
     const { currentEvents } = this.state;
     return (
-      <div className={classes.homeContainer}>
-        <FullCalendar
-          ref={this.calendarRef}
-          plugins={[
-            dayGridPlugin,
-            timeGridPlugin,
-            interactionPlugin,
-            listPlugin,
-          ]}
-          headerToolbar={{
-            start: "today prev,next",
-            center: "title",
-            end: "timeGridDay,timeGridWeek,dayGridMonth,listDay",
-          }}
-          initialView="dayGridMonth"
-          editable={true}
-          selectable={true}
-          selectMirror={true}
-          dayMaxEvents={true}
-          weekends={this.state.weekendsVisible}
-          events={currentEvents}
-          select={this.handleDateSelect}
-          eventDrop={this.handleEventDrop}
-          eventContent={renderEventContent}
-          eventClick={this.handleEventClick}
-          eventDidMount={this.handleEventDidMount}
-          //eventColor="#130663"
-          eventTextColor="#FFFFFF"
-          eventBorderColor="#000000"
-          height={"100vh"}
-          locales={[esLocale]}
-          locale={this.state.locale}
-
-          /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
-        />
-        {this.state.showAppointmentForm && (
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <AppointmentForm
-              open={this.state.showAppointmentForm}
-              onClose={this.handleCloseAppointmentForm}
-              onCreate={this.handleCreateAppointment}
-              selectedDate={this.state.selectedDate}
-              selectedEnd={this.state.selectedEnd}
-              allDay={this.state.allDay}
-              patients={this.state.patients}
-              psycologists={this.state.psychologists}
-            />
-          </MuiPickersUtilsProvider>
-        )}
+      <div>
+        <div className={classes.homeContainer}>
+          <FullCalendar
+            ref={this.calendarRef}
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              interactionPlugin,
+              listPlugin,
+            ]}
+            headerToolbar={{
+              start: "today prev,next",
+              center: "title",
+              end: "timeGridDay,timeGridWeek,dayGridMonth,listDay",
+            }}
+            initialView="dayGridMonth"
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            weekends={this.state.weekendsVisible}
+            events={currentEvents}
+            select={this.handleDateSelect}
+            eventDrop={this.handleEventDrop}
+            eventContent={renderEventContent}
+            eventClick={this.handleEventClick}
+            eventDidMount={this.handleEventDidMount}
+            //eventColor="#130663"
+            eventTextColor="#FFFFFF"
+            eventBorderColor="#000000"
+            height={"100vh"}
+            locales={[esLocale]}
+            locale={this.state.locale}
+          />
+          {this.state.showAppointmentForm && (
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <AppointmentForm
+                open={this.state.showAppointmentForm}
+                onClose={this.handleCloseAppointmentForm}
+                onCreate={this.handleCreateAppointment}
+                onUpdate={this.handleUpdateAppointment}
+                onUpdateWithButton={this.handleUpdateAppointmentWithButton}
+                onDelete={this.handleDeleteAppointment}
+                selectedDate={this.state.selectedDate}
+                selectedEnd={this.state.selectedEnd}
+                allDay={this.state.allDay}
+                patients={this.state.patients}
+                psychologists={this.state.psychologists}
+                selectedEvent={this.state.selectedEvent}
+              />
+            </MuiPickersUtilsProvider>
+          )}
+        </div>
       </div>
     );
   }

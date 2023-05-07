@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DateTimePicker } from "@material-ui/pickers";
 import { Autocomplete } from "@material-ui/lab";
 import { MenuItem } from "@material-ui/core";
@@ -40,35 +40,73 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "normal",
     maxWidth: "280px",
   },
-  formContainer: {
-    display: "flex",
-    justifyContent: "center",
+  formContainer: { display: "flex", justifyContent: "center" },
+  deleteButton: {
+    backgroundColor: "red",
+    color: "white",
+    "&:hover": { backgroundColor: "darkred" },
   },
 }));
 const AppointmentForm = ({
   onClose,
   onCreate,
+  onUpdate,
+  onUpdateWithButton,
+  onDelete,
+  selectedEvent,
   selectedDate,
   selectedEnd,
   allDay,
   patients,
-  psycologists,
+  psychologists,
 }) => {
   const classes = useStyles();
-  const [patientId, setPatientId] = useState("");
-  const [psychologistId, setPsychologistId] = useState("");
-  const [status, setStatus] = useState("");
-  const [notes, setNotes] = useState("");
-  const [price_cop, setPriceCop] = useState("");
-  const [dateTime, setDateTime] = useState(selectedDate);
-  const [endDateTime, setEndDateTime] = useState(selectedEnd);
+  const [patientId, setPatientId] = useState(
+    selectedEvent ? selectedEvent.extendedProps.patient_id : null
+  );
+  const [psychologistId, setPsychologistId] = useState(
+    selectedEvent ? selectedEvent.extendedProps.psychologist_id : null
+  );
+  const [status, setStatus] = useState(
+    selectedEvent ? selectedEvent.extendedProps.status : ""
+  );
+  const [notes, setNotes] = useState(
+    selectedEvent ? selectedEvent.extendedProps.notes : ""
+  );
+  const [price_cop, setPriceCop] = useState(
+    selectedEvent ? selectedEvent.extendedProps.price_cop : ""
+  );
+  const [dateTime, setDateTime] = useState(
+    selectedEvent ? selectedEvent.start.toISOString() : selectedDate
+  );
+  const [endDateTime, setEndDateTime] = useState(
+    selectedEvent ? selectedEvent.end.toISOString() : selectedEnd
+  );
+  const [eventData, setEventData] = useState(null);
+
+  console.log("patients:", patients);
+  console.log("psychologists:", psychologists);
+  useEffect(() => {
+    if (selectedEvent) {
+      setEventData({
+        patientId: selectedEvent.extendedProps.patient_id,
+        psychologistId: selectedEvent.extendedProps.psychologist_id,
+        status: selectedEvent.extendedProps.status,
+        notes: selectedEvent.extendedProps.notes,
+        priceCop: selectedEvent.extendedProps.price_cop,
+        start: selectedEvent.start.toISOString(),
+        end: selectedEvent.end.toISOString(),
+      });
+    } else {
+      setEventData(null);
+    }
+  }, [selectedEvent]);
   const [error, setError] = useState(null);
   const [notesError, setNotesError] = useState("");
   const [statusError, setStatusError] = useState("");
   const [patientError, setPatientError] = useState("");
   const [priceCopError, setPriceCopError] = useState("");
   const [psychologistError, setPsychologistError] = useState("");
-
   const isDateValid = () => {
     const startDate = new Date(dateTime);
     const endDate = new Date(endDateTime);
@@ -101,7 +139,6 @@ const AppointmentForm = ({
     } else {
       setError("");
     }
-
     if (!status) {
       setStatusError("Por favor, seleccione el estado de la cita");
       hasErrors = true;
@@ -120,26 +157,37 @@ const AppointmentForm = ({
     } else {
       setPriceCopError("");
     }
-
     if (!hasErrors) {
-      onCreate({
-        patientId,
-        psychologistId,
-        start: dateTime,
-        end: endDateTime,
-        allDay,
-        status,
-        notes,
-        price_cop,
-      });
+      if (selectedEvent) {
+        onUpdateWithButton(selectedEvent, eventData);
+      } else {
+        const newPatient = patients.find((p) => p.id === patientId);
+        const newPsychologist = psychologists.find(
+          (p) => p.id === psychologistId
+        );
+        onCreate({
+          patientId: newPatient,
+          psychologistId: newPsychologist,
+          start: dateTime,
+          end: endDateTime,
+          allDay,
+          status: status,
+          notes: notes,
+          price_cop: price_cop,
+        });
+      }
       onClose();
     }
   };
   return (
     <div className={classes.formContainer}>
+      {" "}
       <Dialog open onClose={onClose} maxWidth="md">
         {" "}
-        <DialogTitle>Crear cita</DialogTitle>{" "}
+        <DialogTitle>
+          {" "}
+          {selectedEvent ? "Actualizar Cita" : "Crear Cita"}{" "}
+        </DialogTitle>{" "}
         <DialogContent className={classes.dialogContent}>
           {" "}
           <form onSubmit={handleSubmit} className={classes.form}>
@@ -148,9 +196,9 @@ const AppointmentForm = ({
               id="patientId"
               options={patients}
               getOptionLabel={(option) => (option ? option.name : "")}
-              value={patientId}
+              value={patients.find((p) => p.id === patientId) || null}
               onChange={(event, newValue) => {
-                setPatientId(newValue);
+                setPatientId(newValue ? newValue.id : null);
                 if (newValue) {
                   setPatientError("");
                 }
@@ -161,15 +209,14 @@ const AppointmentForm = ({
             />{" "}
             {patientError && (
               <FormHelperText error>{patientError}</FormHelperText>
-            )}
-            <br />{" "}
+            )}{" "}
             <Autocomplete
               id="psychologistId"
-              options={psycologists}
+              options={psychologists}
               getOptionLabel={(option) => (option ? option.name : "")}
-              value={psychologistId}
+              value={psychologists.find((p) => p.id === psychologistId) || null}
               onChange={(event, newValue) => {
-                setPsychologistId(newValue);
+                setPsychologistId(newValue ? newValue.id : null);
                 if (newValue) {
                   setPsychologistError("");
                 }
@@ -177,11 +224,11 @@ const AppointmentForm = ({
               renderInput={(params) => (
                 <TextField {...params} label="Psicólogo" variant="outlined" />
               )}
-            />{" "}
+            />
             {psychologistError && (
               <FormHelperText error>{psychologistError}</FormHelperText>
-            )}
-            <br />
+            )}{" "}
+            <br />{" "}
             <TextField
               id="selectedDate"
               label="Fecha y hora de inicio"
@@ -223,12 +270,14 @@ const AppointmentForm = ({
             />{" "}
             {error && (
               <FormHelperText className={classes.errorMessage} error>
+                {" "}
                 {error}{" "}
               </FormHelperText>
             )}{" "}
-            <br />
+            <br />{" "}
             <FormControl className={classes.formControl}>
-              <InputLabel id="status-label">Estado de la cita</InputLabel>
+              {" "}
+              <InputLabel id="status-label">Estado de la cita</InputLabel>{" "}
               <Select
                 labelId="status-label"
                 id="status"
@@ -236,15 +285,16 @@ const AppointmentForm = ({
                 onChange={(event) => setStatus(event.target.value)}
                 required
               >
-                <MenuItem value={"active"}>Activa</MenuItem>
-                <MenuItem value={"cancelled"}>Cancelada</MenuItem>
-                <MenuItem value={"in_progress"}>En progreso</MenuItem>
-              </Select>
-            </FormControl>
+                {" "}
+                <MenuItem value={"active"}>Activa</MenuItem>{" "}
+                <MenuItem value={"cancelled"}>Cancelada</MenuItem>{" "}
+                <MenuItem value={"in_progress"}>En progreso</MenuItem>{" "}
+              </Select>{" "}
+            </FormControl>{" "}
             {statusError && (
               <FormHelperText error>{statusError}</FormHelperText>
-            )}
-            <br />
+            )}{" "}
+            <br />{" "}
             <TextField
               id="notes"
               label="Notas"
@@ -253,8 +303,8 @@ const AppointmentForm = ({
               variant="outlined"
               required
             />{" "}
-            {notesError && <FormHelperText error>{notesError}</FormHelperText>}
-            <br />
+            {notesError && <FormHelperText error>{notesError}</FormHelperText>}{" "}
+            <br />{" "}
             <TextField
               id="price_cop"
               label="Precio Consulta"
@@ -267,35 +317,42 @@ const AppointmentForm = ({
                 }
               }}
               variant="outlined"
-              inputProps={{
-                min: 0,
-                step: 100,
-              }}
+              inputProps={{ min: 0, step: 100 }}
               required
             />{" "}
             {priceCopError && (
               <FormHelperText error>{priceCopError}</FormHelperText>
-            )}
-            <br />
-          </form>{" "}
-        </DialogContent>{" "}
+            )}{" "}
+            <br />{" "}
+          </form>
+        </DialogContent>
         <DialogActions>
-          {" "}
           <Button onClick={onClose} color="primary">
-            {" "}
-            Cancelar{" "}
-          </Button>{" "}
+            Cancelar
+          </Button>
+          {selectedEvent && (
+            <Button
+              onClick={() => {
+                onDelete(selectedEvent);
+                onClose();
+              }}
+              className={classes.deleteButton}
+              color="secondary"
+            >
+              Eliminar
+            </Button>
+          )}
           <Button
             onClick={handleSubmit}
             className={classes.createButton}
             color="primary"
           >
-            {" "}
-            Crear cita{" "}
-          </Button>{" "}
-        </DialogActions>{" "}
+            {selectedEvent ? "Actualizar Cita" : "Crear Cita"}
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );
 };
+
 export default AppointmentForm;

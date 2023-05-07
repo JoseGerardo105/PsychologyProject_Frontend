@@ -1,133 +1,198 @@
-import React from "react";
-import Alerta from "../components/Alerta";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const RegisterPatient = () => {
-  const [nombre, getNombre] = useState("");
-  const [tipodoc, getTipoDoc] = useState("");
-  const [documento, getDoc] = useState("");
-  const [email, getEmail] = useState("");
-  const [telefono, getTelefono] = useState("");
-  const [direccion, getDireccion] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [tipodoc, setTipoDoc] = useState(1);
+  const [documento, setDocumento] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [direccion, setDireccion] = useState("");
 
-  const [alerta, setAlerta] = useState({});
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
+  const createPatient = async (patientData) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/psychologists/create-patients",
+        patientData
+      );
+      if (response.status !== 201) {
+        throw new Error("Error al crear el paciente");
+      }
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if ([nombre, tipodoc, documento, email,telefono,direccion].includes("")) {
-      setAlerta({ msg: "Hay valores vacios", err: true });
-      console.log("Hay valores vacios");
+    let errorMessages = {};
+    if (!nombre.trim()) {
+      errorMessages.nombre = "El nombre es obligatorio";
+    }
+    if (!documento.trim()) {
+      errorMessages.documento = "El documento es obligatorio";
+    } else if (tipodoc !== 4 && isNaN(documento)) {
+      errorMessages.documento = "El documento debe ser un número";
+    }
+    if (!email.trim()) {
+      errorMessages.email = "El correo electrónico es obligatorio";
+    } else if (!validateEmail(email)) {
+      errorMessages.email = "El formato del correo electrónico es inválido";
+    }
+    if (!telefono.trim()) {
+      errorMessages.telefono = "El teléfono es obligatorio";
+    } else if (isNaN(telefono) || telefono.length < 7 || telefono.length > 10) {
+      errorMessages.telefono =
+        "El teléfono debe contener entre 7 y 10 caracteres numericos";
+    }
+    if (!direccion.trim()) {
+      errorMessages.direccion = "La dirección es obligatoria";
+    }
+    if (Object.keys(errorMessages).length > 0) {
+      setErrors(errorMessages);
       return;
     }
-    if (isNaN(documento)) {
-      setAlerta({ msg: "El documento introducido no es valido", err: true });
-      console.log("El documento introducido no es valido");
-      return;
+    const patientData = {
+      nombre,
+      tipodoc,
+      documento,
+      email,
+      telefono,
+      direccion,
+    };
+    try {
+      await createPatient(patientData);
+      setErrors({});
+      navigate("/home");
+    } catch (error) {
+      setErrors({ submit: "Error al crear el paciente" });
     }
-
-    if (isNaN(telefono) || telefono.length != 7) {
-      setAlerta({ msg: "El telefono introducido no es valido", err: true });
-      console.log("El telefono introducido no es valido");
-      return;
-    }
-    setAlerta({ msg: "Usuario creado" , err: false});
-    navigate("/home")
-  }
-
-  const { msg } = alerta;
+  };
 
   return (
     <>
+      {" "}
       <form
-        classaction=""
-        className="bg-gray-300 rounded-xl my-1 md:my-2 xl:my-4 w-full sm:w-full md:w-full lg:w-7/8 xl:w-3/4 mx-auto p-8 shadow-lg"
+        className="bg-gray-300 rounded-xl my-2 md:my-4 xl:my-4 w-full sm:w-12/12 md:w-11/12 lg:w-9/12 xl:w-8/12 mx-auto p-8 shadow-lg"
         onSubmit={handleSubmit}
       >
-        {msg && <Alerta alerta={alerta} />}
+        {" "}
         <div>
+          {" "}
           <h1 className="text-black block text-6xl font-bold text-center ">
-            Registro Paciente
-          </h1>
-        </div>
-        <div className="my-10 mx-5">
+            Registro Paciente{" "}
+          </h1>{" "}
+        </div>{" "}
+        <div className="my-8 mx-5">
+          {" "}
           <label className="text-black block text-xl font-bold">Nombre</label>
           <input
             type="text"
             placeholder="Nombre del paciente"
             className="border w-full p-3 mt-3 rounded-xl"
             value={nombre}
-            onChange={(e) => getNombre(e.target.value)}
-          />
-        </div>
-        <div className="my-10 mx-5">
+            onChange={(e) => setNombre(e.target.value)}
+          />{" "}
+          {errors.nombre && (
+            <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>
+          )}
+        </div>{" "}
+        <div className="my-5 mx-5">
+          {" "}
           <label className="text-black block text-xl font-bold">
-            Documento
-          </label>
+            Documento{" "}
+          </label>{" "}
           <select
             name="Tipo"
             id="Tipo"
             className="border w-1/4 p-3 mt-3 rounded-xl"
             value={tipodoc}
-            onChange={(e) => getTipoDoc(e.target.value)}
+            onChange={(e) => setTipoDoc(parseInt(e.target.value))}
           >
-            <option value="CC">Cedula de Ciudadania</option>
-            <option value="TI">Tarjeta de Identidad</option>
-            <option value="CE">Cedula de Extranjeria</option>
-            <option value="PP">Pasaporte</option>
+            <option value={1}>Cedula de Ciudadania</option>
+            <option value={2}>Tarjeta de Identidad</option>{" "}
+            <option value={3}>Cedula de Extranjeria</option>{" "}
+            <option value={4}>Pasaporte</option>{" "}
           </select>
           <input
             type="text"
             placeholder="Num. de identidad"
             className="border w-3/4 p-3 mt-3 rounded-xl"
             value={documento}
-            onChange={(e) => getDoc(e.target.value)}
-          />
-        </div>
-
-        <div className="my-10 mx-5">
-          <label className="text-black block text-xl font-bold">Correo</label>
+            onChange={(e) => setDocumento(e.target.value)}
+          />{" "}
+          {errors.documento && (
+            <p className="text-red-500 text-xs mt-1">{errors.documento}</p>
+          )}{" "}
+        </div>{" "}
+        <div className="my-5 mx-5">
+          {" "}
+          <label className="text-black block text-xl font-bold">
+            Correo
+          </label>{" "}
           <input
             type="e-mail"
             placeholder="E-mail del paciente"
             className="border w-full p-3 mt-3 rounded-xl"
             value={email}
-            onChange={(e) => getEmail(e.target.value)}
-          />
-        </div>
-
-        <div className="my-10 mx-5">
-          <label className="text-black block text-xl font-bold">Telefono</label>
+            onChange={(e) => setEmail(e.target.value)}
+          />{" "}
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+          )}{" "}
+        </div>{" "}
+        <div className="my-5 mx-5">
+          {" "}
+          <label className="text-black block text-xl font-bold">
+            Telefono
+          </label>{" "}
           <input
             type="text"
             placeholder="Telefono del paciente"
             className="border w-full p-3 mt-3 rounded-xl"
             value={telefono}
-            onChange={(e) => getTelefono(e.target.value)}
-          />
-        </div>
-
-        <div className="my-10 mx-5">
+            onChange={(e) => setTelefono(e.target.value)}
+          />{" "}
+          {errors.telefono && (
+            <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>
+          )}{" "}
+        </div>{" "}
+        <div className="my-5 mx-5">
+          {" "}
           <label className="text-black block text-xl font-bold">
-            Direccion
-          </label>
+            Direccion{" "}
+          </label>{" "}
           <input
             type="text"
             placeholder="Direccion del paciente"
             className="border w-full p-3 mt-3 rounded-xl"
             value={direccion}
-            onChange={(e) => getDireccion(e.target.value)}
-          />
-        </div>
-
+            onChange={(e) => setDireccion(e.target.value)}
+          />{" "}
+          {errors.direccion && (
+            <p className="text-red-500 text-xs mt-1">{errors.direccion}</p>
+          )}{" "}
+        </div>{" "}
         <input
           type="submit"
           value="Registrar"
           className="bg-black my-5 mx-auto w-full h-10 rounded-xl font-normal mt-5 hover:cursor-pointer hover:bg-gray-200 text-white"
-        />
-      </form>
+        />{" "}
+        {errors.submit && (
+          <p className="text-red-500 text-center mt-1">{errors.submit}</p>
+        )}{" "}
+      </form>{" "}
     </>
   );
 };
