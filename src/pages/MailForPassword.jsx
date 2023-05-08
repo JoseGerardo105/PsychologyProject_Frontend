@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alerta from "../components/Alerta";
-import axios from "axios";
+import axiosClient from '../config/axios';
+
+
 const MailForPassword = () => {
   const [email, setEmail] = useState("");
   const [alerta, setAlerta] = useState({});
@@ -9,31 +11,33 @@ const MailForPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) {
-      setAlerta({ msg: "Se requiere correo electrónico" });
+      setAlerta({ msg: "Se requiere correo electrónico", err:true });
       return;
     }
     if (!email.includes("@") || !email.includes(".")) {
-      setAlerta({ msg: "Ingrese un correo electrónico válido" });
+      setAlerta({ msg: "Ingrese un correo electrónico válido", err:true});
       return;
     }
     try {
-      const response = await axios.patch(
-        "http://localhost:4000/api/psychologists/change-password/",
+      const url = '/psychologists/change-password/';
+
+      const response = await axiosClient.patch(
+        url,
         { email: email }
       );
+
       if (response.data.msg) {
         setAlerta({ msg: response.data.msg });
-        navigate("/");
       } else {
-        setAlerta({ msg: "Error al enviar las instrucciones" });
+        setAlerta({ msg: "Error al enviar las instrucciones"});
       }
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico desde el backend
-        setAlerta({ msg: error.response.data.error });
+        setAlerta({ msg: error.response.data.error, err:true });
       } else {
-        setAlerta({ msg: "Error al enviar las instrucciones" });
+        setAlerta({ msg: "Error al enviar las instrucciones", err:true });
       }
     }
   };

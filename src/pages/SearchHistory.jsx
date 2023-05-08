@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import axios from 'axios';
+import axiosClient from '../config/axios';
 
 class SearchHistory extends Component{
   constructor(props) {
@@ -10,7 +10,7 @@ class SearchHistory extends Component{
   }
 
   componentDidMount() {
-    axios.get('/api/datos')
+    axiosClient.get('/api/datos')
       .then(response => {
         this.setState({ datos: response.data });
       })

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Autocomplete } from "@material-ui/lab";
 import { TextField } from "@material-ui/core";
-import axios from "axios";
+import axiosClient from "../config/axios";
 
 const CreateHistory = () => {
   const [patientId, setPatientId] = useState("");
@@ -74,8 +74,8 @@ const CreateHistory = () => {
         treatment_plan: plan,
         observations: observaciones,
       };
-      await axios.post(
-        "http://localhost:4000/api/psychologists/create-medical-records",
+      await axiosClient.post(
+        "/psychologists/create-medical-records",
         medicalRecordData
       );
       setErrors({});
@@ -86,8 +86,8 @@ const CreateHistory = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/psychologists/get-patients"
+      const response = await axiosClient.get(
+        "/psychologists/get-patients"
       );
       const patients = response.data;
       console.log("Respuesta de la API ", response.data);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosClient from '../config/axios';
+
 
 const RegisterPatient = () => {
   const [nombre, setNombre] = useState("");
@@ -16,8 +17,10 @@ const RegisterPatient = () => {
 
   const createPatient = async (patientData) => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/psychologists/create-patients",
+      const url = '/psychologists/create-patients';
+
+      const response = await axiosClient.post(
+        url,
         patientData
       );
       if (response.status !== 201) {

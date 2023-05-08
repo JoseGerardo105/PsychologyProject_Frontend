@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alerta from "../components/Alerta";
-import axios from "axios";
+import axiosClient from '../config/axios';
+
 
 const Login = () => {
   const [nombre, getNombre] = useState("");
@@ -19,8 +20,9 @@ const Login = () => {
       return;
     }
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/psychologists/login",
+      const url = '/psychologists/login';
+      const response = await axiosClient.post(
+        url,
         {
           email: nombre,
           password: password,

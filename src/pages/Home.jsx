@@ -10,7 +10,8 @@ import esLocale from "@fullcalendar/core/locales/es";
 import AppointmentForm from "../components/AppointmentForm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import axios from "axios";
+import axiosClient from '../config/axios';
+
 
 const useStyles = makeStyles((theme) => ({
   homeContainer: {
@@ -63,8 +64,9 @@ class Home extends React.Component {
 
   fetchAppointments = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/psychologists/get-appointments"
+
+      const response = await axiosClient.get(
+        "/psychologists/get-appointments"
       );
       const appointments = response.data;
       console.log("Citas Cargadas cargados: ", appointments);
@@ -94,8 +96,8 @@ class Home extends React.Component {
 
   fetchPatients = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/psychologists/get-patients"
+      const response = await axiosClient.get(
+        "/psychologists/get-patients"
       );
       const patients = response.data;
       this.setState({ patients });
@@ -108,8 +110,8 @@ class Home extends React.Component {
 
   fetchPsychologists = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:4000/api/psychologists/get-psychologists"
+      const response = await axiosClient.get(
+        "/psychologists/get-psychologists"
       );
       const psychologists = response.data;
       this.setState({ psychologists });
@@ -149,8 +151,8 @@ class Home extends React.Component {
     const price_cop = info.event.extendedProps.price_cop;
 
     try {
-      await axios.patch(
-        `http://localhost:4000/api/psychologists/update-appointment/${eventId}`,
+      await axiosClient.patch(
+        `/psychologists/update-appointment/${eventId}`,
         {
           start_time: newStartTime,
           end_time: newEndTime,
@@ -182,8 +184,8 @@ class Home extends React.Component {
       price_cop,
     } = formData;
     try {
-      await axios.post(
-        "http://localhost:4000/api/psychologists/create-appointment",
+      await axiosClient.post(
+        "/psychologists/create-appointment",
         {
           patient_id: patientId.id,
           psychologist_id: psychologistId.id,
@@ -218,8 +220,8 @@ class Home extends React.Component {
     const eventId = selectedEvent.id;
 
     try {
-      await axios.delete(
-        `http://localhost:4000/api/psychologists/delete-appointment/${eventId}`
+      await axiosClient.delete(
+        `/psychologists/delete-appointment/${eventId}`
       );
     } catch (error) {
       console.error("Error al eliminar la cita:", error);
@@ -232,8 +234,8 @@ class Home extends React.Component {
   handleUpdateAppointment = async (selectedEvent, updatedData) => {
     const eventId = selectedEvent.id;
     try {
-      await axios.patch(
-        `http://localhost:4000/api/psychologists/update-appointment-form/${eventId}`,
+      await axiosClient.patch(
+        `/psychologists/update-appointment-form/${eventId}`,
         {
           start_time: updatedData.start,
           end_time: updatedData.end,
@@ -261,8 +263,8 @@ class Home extends React.Component {
   handleUpdateAppointmentWithButton = async (selectedEvent, updatedData) => {
     const eventId = selectedEvent.id;
     try {
-      await axios.patch(
-        `http://localhost:4000/api/psychologists/update-appointment/${eventId}`,
+      await axiosClient.patch(
+        `/psychologists/update-appointment/${eventId}`,
         {
           start_time: updatedData.start,
           end_time: updatedData.end,

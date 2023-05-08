@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alerta from "../components/Alerta";
-import axios from "axios";
+import axiosClient from '../config/axios';
+
 
 const Register = () => {
   const [nombre, setNombre] = useState("");
@@ -32,19 +33,16 @@ const Register = () => {
     }
     if (password.length < 8) {
       setAlerta({
-        msg: "La contraseña no es lo suficientemente larga. Tiene que tener minimo 8 caracteres", err: true
+        msg: "La contraseña no es lo suficientemente larga. Debe tener minimo 8 caracteres", err: true
       });
-      console.log(
-        "La contraseña no es lo suficientemente larga. Tiene que tener minimo 8 caracteres"
-      );
       return;
     }
 
-    setAlerta({ msg: "datos correctos" , err: false});
+    setAlerta({ msg: "Datos correctos" , err: false});
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/psychologists/register",
+      const url = '/psychologists/register';
+      const response = await axiosClient.post(url,
         {
           name: nombre,
           email: email,
@@ -53,8 +51,8 @@ const Register = () => {
       );
 
       if (response.data.message) {
-        setAlerta({ msg: "Cuenta creada exitosamente" , err: false});
-        navigate("/");
+        setAlerta({ msg: "Cuenta creada exitosamente revisa tu email para confirmar registro" , err: false});
+        // navigate("/");
       } else {
         setAlerta({ msg: "Error al crear cuenta" , err: true});
       }
