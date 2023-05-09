@@ -1,30 +1,56 @@
-import React, {Component} from 'react';
-import axiosClient from '../config/axios';
+import React, { Component } from "react";
+import axiosClient from "../config/axios";
 
-class SearchHistory extends Component{
+class SearchHistory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      datos: []
+      datos: [],
     };
   }
 
+  fetchPatientName = async (patientId) => {
+    try {
+      const response = await axiosClient.get(
+        `/psychologists/get-patient/${patientId}`
+      );
+      const patient = response.data;
+      console.log("nombre del pacienre", patient.name);
+      return patient.name;
+    } catch (error) {
+      console.error("Error al obtener el paciente:", error);
+      return null;
+    }
+  };
+  fetchMedicalRecords = async () => {
+    try {
+      const response = await axiosClient.get(
+        "/psychologists/get-medical-records"
+      );
+      const medicalRecords = response.data;
+      for (let record of medicalRecords) {
+        record.patient_name = await this.fetchPatientName(record.patient_id);
+      }
+      this.setState({ datos: medicalRecords });
+      return medicalRecords;
+    } catch (error) {
+      console.error("Error al obtener los registros medicos:", error);
+    }
+  };
+
   componentDidMount() {
-    axiosClient.get('/api/datos')
-      .then(response => {
-        this.setState({ datos: response.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    this.fetchMedicalRecords();
   }
 
   render() {
+    const rowStyle = {
+      backgroundColor: "#DEDEDE",
+    };
     return (
       <div>
-         <h1 className="text-black block text-4xl font-bold text-center float-left ">
-              Mis historias
-         </h1>
+        <h1 className="text-black block text-4xl font-bold text-center float-left ">
+          Mis historias
+        </h1>
         <input
           type="text"
           placeholder="Buscar"
@@ -40,9 +66,9 @@ class SearchHistory extends Component{
           </thead>
           <tbody className=" bg-slate-500">
             {this.state.datos.map((dato, index) => (
-              <tr key={index}>
-                <td className="border px-4 py-2">{dato.nombre}</td>
-                <td className="border px-4 py-2">{dato.documento}</td>
+              <tr key={index} style={rowStyle}>
+                <td className="border px-4 py-2">{dato.patient_name}</td>
+                <td className="border px-4 py-2">{dato.document_number}</td>
                 <td className="border px-4 py-2 underline">Ver historia</td>
               </tr>
             ))}

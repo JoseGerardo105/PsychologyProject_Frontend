@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
+import axiosClient from "../config/axios";
 import { useState } from "react";
+import { Spa } from "@material-ui/icons";
 
 class SearchPatient extends Component {
   constructor(props) {
@@ -10,24 +12,32 @@ class SearchPatient extends Component {
     };
   }
 
+  fetchPatients = async () => {
+    try {
+      const response = await axiosClient.get("/psychologists/get-patients");
+      const patients = response.data;
+      console.log("estructura de aocientes:", patients[0]);
+      this.setState({ datos: patients });
+      console.log("Pacientes cargados: ", patients);
+      return patients;
+    } catch (error) {
+      console.error("Error al obtener los pacientes:", error);
+    }
+  };
   componentDidMount() {
-    axios
-      .get("/api/datos")
-      .then((response) => {
-        this.setState({ datos: response.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.fetchPatients();
   }
 
   render() {
-   // const [searchTerm, setSearchTerm] = useState("");
+    // const [searchTerm, setSearchTerm] = useState("");
+    const rowStyle = {
+      backgroundColor: "#DEDEDE",
+    };
     return (
       <div>
-         <h1 className="text-black block text-4xl font-bold text-center float-left ">
-              Mis pacientes
-         </h1>
+        <h1 className="text-black block text-4xl font-bold text-center float-left ">
+          Mis pacientes
+        </h1>
         <input
           type="text"
           placeholder="Buscar"
@@ -45,12 +55,12 @@ class SearchPatient extends Component {
           </thead>
           <tbody className=" bg-slate-500">
             {this.state.datos.map((dato, index) => (
-              <tr key={index}>
-                <td className="border px-4 py-2">{dato.nombre}</td>
-                <td className="border px-4 py-2">{dato.documento}</td>
-                <td className="border px-4 py-2">{dato.correo}</td>
-                <td className="border px-4 py-2">{dato.telefono}</td>
-                <td className="border px-4 py-2">{dato.direccion}</td>
+              <tr key={index} style={rowStyle}>
+                <td className="border px-4 py-2">{dato.name}</td>
+                <td className="border px-4 py-2">{dato.document_number}</td>
+                <td className="border px-4 py-2">{dato.email}</td>
+                <td className="border px-4 py-2">{dato.phone}</td>
+                <td className="border px-4 py-2">{dato.address}</td>
               </tr>
             ))}
           </tbody>
