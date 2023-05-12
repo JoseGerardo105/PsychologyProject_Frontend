@@ -196,6 +196,7 @@ class Home extends React.Component {
           price_cop: price_cop,
         }
       );
+      console.log('cita creada')
     } catch (error) {
       console.error("Error al crear la cita:", error);
     }

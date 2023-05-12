@@ -38,8 +38,6 @@ const Register = () => {
       return;
     }
 
-    setAlerta({ msg: "Datos correctos" , err: false});
-
     try {
       const url = '/psychologists/register';
       const response = await axiosClient.post(url,

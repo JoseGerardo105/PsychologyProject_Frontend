@@ -120,13 +120,13 @@ const AppointmentForm = ({
     e.preventDefault();
     let hasErrors = false;
     if (!psychologistId) {
-      setPsychologistError("Porfavor, selecciona un psicólogo.");
+      setPsychologistError("Por favor, selecciona un psicólogo.");
       hasErrors = true;
     } else {
       setPsychologistError("");
     }
     if (!patientId) {
-      setPatientError("Porfavor, selecciona un paciente.");
+      setPatientError("Por favor, selecciona un paciente.");
       hasErrors = true;
     } else {
       setPatientError("");
@@ -165,6 +165,7 @@ const AppointmentForm = ({
         const newPsychologist = psychologists.find(
           (p) => p.id === psychologistId
         );
+
         onCreate({
           patientId: newPatient,
           psychologistId: newPsychologist,
