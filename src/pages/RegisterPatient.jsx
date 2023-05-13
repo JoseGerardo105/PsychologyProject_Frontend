@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosClient from '../config/axios';
+const styles = { fontFamily: "Oleo Script" };
 
 
 const RegisterPatient = () => {
@@ -93,8 +94,11 @@ const RegisterPatient = () => {
         {" "}
         <div>
           {" "}
-          <h1 className="text-black block text-6xl font-bold text-center ">
-            Registro Paciente{" "}
+          <h1
+            className="text-indigo-900 block text-8xl font-bold text-center "
+            style={styles}
+          >
+            Registrar <span className="text-black">paciente</span>{" "}
           </h1>{" "}
         </div>{" "}
         <div className="my-8 mx-5">

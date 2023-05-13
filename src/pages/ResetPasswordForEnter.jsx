@@ -31,6 +31,18 @@ const ResetPasswordForEnter = () => {
     comprobeToken();
   }, []);
 
+  useEffect(() => {
+    if (alerta.msg) {
+      const timer = setTimeout(() => {
+        setAlerta({});
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [alerta]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== rewritePassword) {

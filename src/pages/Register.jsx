@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Alerta from "../components/Alerta";
 import axiosClient from '../config/axios';
@@ -13,6 +13,18 @@ const Register = () => {
   const [alerta, setAlerta] = useState({});
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (alerta.msg) {
+      const timer = setTimeout(() => {
+        setAlerta({});
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [alerta]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

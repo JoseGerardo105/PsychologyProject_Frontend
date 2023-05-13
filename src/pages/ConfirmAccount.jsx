@@ -33,6 +33,19 @@ function ConfirmAccount() {
 
     confirmAccount();
   }, []);
+
+  useEffect(() => {
+    if (alerta.msg) {
+      const timer = setTimeout(() => {
+        setAlerta({});
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [alerta]);
+
   return (
     <>
       <div>

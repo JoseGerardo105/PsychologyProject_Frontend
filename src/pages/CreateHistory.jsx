@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Autocomplete } from "@material-ui/lab";
 import { TextField } from "@material-ui/core";
 import axiosClient from "../config/axios";
+const styles = { fontFamily: "Oleo Script" };
 
 const CreateHistory = () => {
   const [patientId, setPatientId] = useState("");
@@ -113,9 +114,9 @@ const CreateHistory = () => {
           {" "}
           <div>
             {" "}
-            <h1 className="text-black block text-6xl font-bold text-center ">
+            <h1 className="text-indigo-900 block text-8xl font-bold text-center " style={styles}>
               {" "}
-              Nueva Historia{" "}
+              Nueva <span className="text-black">historia</span> {" "}
             </h1>{" "}
           </div>{" "}
           <div className="my-5 mx-5">
