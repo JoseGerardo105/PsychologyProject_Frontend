@@ -50,23 +50,26 @@ class SearchHistory extends Component {
     };
     return (
       <div>
-        <h1 className="text-indigo-900 block text-6xl font-bold text-center float-left " style={styles}>
-        Mis  <span className="text-black">historias</span> 
+        <h1
+          className="text-indigo-900 block text-6xl font-bold text-center float-left "
+          style={styles}
+        >
+          Mis <span className="text-black">historias</span>
         </h1>
         <div className="float-right w-1/3 focus:outline-none py-2 px-4">
-        <form action="">
-          <input
-            type="text"
-            placeholder="Buscar"
-            className=" border w-3/5 p-3  rounded-xl focus:ring-indigo-500 focus:border-indigo-500 mt-5 h-10"
-          />
-          <input
-            type="submit"
-            value="Buscar historia"
-            className="bg-black text-white my-5 mx-auto w-1/3 h-10 rounded-xl font-normal mt-5 hover:cursor-pointer hover:bg-gray-200 float-right"
-          />
-        </form>
-      </div>
+          <form action="">
+            <input
+              type="text"
+              placeholder="Buscar"
+              className=" border w-3/5 p-3  rounded-xl focus:ring-indigo-500 focus:border-indigo-500 mt-5 h-10"
+            />
+            <input
+              type="submit"
+              value="Buscar historia"
+              className="bg-black text-white my-5 mx-auto w-1/3 h-10 rounded-xl font-normal mt-5 hover:cursor-pointer hover:bg-gray-200 float-right"
+            />
+          </form>
+        </div>
         <table className="table-auto w-full border-gray-400 px-4 py-2 bg-gray-100 text-gray-800 text-center text-base flex-col sm:flex-row">
           <thead>
             <tr>
@@ -82,7 +85,7 @@ class SearchHistory extends Component {
                 <td className="border px-4 py-2">{dato.document_number}</td>
                 <td className="border px-4 py-2 underline">Ver historia</td>
                 <td>
-                  <Delete/>
+                  <Delete />
                 </td>
               </tr>
             ))}

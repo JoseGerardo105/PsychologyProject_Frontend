@@ -64,7 +64,7 @@ const CreateHistory = () => {
     const newPatient = patients && patients.find((p) => p.id === patientId);
     try {
       const medicalRecordData = {
-        patientId: newPatient.id,
+        patient_id: newPatient.id,
         document_number: newPatient.document_number,
         date_of_birth: edad,
         ocupation: ocupacion,
@@ -87,9 +87,7 @@ const CreateHistory = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await axiosClient.get(
-        "/psychologists/get-patients"
-      );
+      const response = await axiosClient.get("/psychologists/get-patients");
       const patients = response.data;
       console.log("Respuesta de la API ", response.data);
       setPatients(patients);
@@ -114,9 +112,12 @@ const CreateHistory = () => {
           {" "}
           <div>
             {" "}
-            <h1 className="text-indigo-900 block text-8xl font-bold text-center " style={styles}>
+            <h1
+              className="text-indigo-900 block text-8xl font-bold text-center "
+              style={styles}
+            >
               {" "}
-              Nueva <span className="text-black">historia</span> {" "}
+              Nueva <span className="text-black">historia</span>{" "}
             </h1>{" "}
           </div>{" "}
           <div className="my-5 mx-5">
