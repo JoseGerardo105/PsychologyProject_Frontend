@@ -81,6 +81,10 @@ const ContentLayout = () => {
   const handleClickHistorias = () => {
     setOpenHistorias(!openHistorias);
   };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
   return (
     <>
       {" "}
@@ -255,7 +259,7 @@ const ContentLayout = () => {
                 </ListItem>{" "}
               </Link>
               <Link to="/">
-                <ListItem button>
+                <ListItem button onClick={handleLogout}>
                   {" "}
                   <ListItemIcon className={classes.icon}>
                     {" "}

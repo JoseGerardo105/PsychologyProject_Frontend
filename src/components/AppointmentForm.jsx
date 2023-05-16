@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { DateTimePicker } from "@material-ui/pickers";
 import { Autocomplete } from "@material-ui/lab";
-import { MenuItem } from "@material-ui/core";
+import { MenuItem, Typography } from "@material-ui/core";
+
 import {
   Dialog,
   DialogTitle,
@@ -61,46 +62,41 @@ const AppointmentForm = ({
   psychologists,
 }) => {
   const classes = useStyles();
-  const [patientId, setPatientId] = useState(
-    selectedEvent ? selectedEvent.extendedProps.patient_id : null
-  );
-  const [psychologistId, setPsychologistId] = useState(
-    selectedEvent ? selectedEvent.extendedProps.psychologist_id : null
-  );
-  const [status, setStatus] = useState(
-    selectedEvent ? selectedEvent.extendedProps.status : ""
-  );
-  const [notes, setNotes] = useState(
-    selectedEvent ? selectedEvent.extendedProps.notes : ""
-  );
-  const [price_cop, setPriceCop] = useState(
-    selectedEvent ? selectedEvent.extendedProps.price_cop : ""
-  );
+  const [patientId, setPatientId] = useState("");
+  const [psychologistId, setPsychologistId] = useState("");
+  const [status, setStatus] = useState("");
+  const [notes, setNotes] = useState("");
+  const [price_cop, setPriceCop] = useState("");
   const [dateTime, setDateTime] = useState(
-    selectedEvent ? selectedEvent.start.toISOString() : selectedDate
+    selectedEvent
+      ? selectedEvent.start.toISOString()
+      : selectedDate || new Date().toISOString()
   );
   const [endDateTime, setEndDateTime] = useState(
-    selectedEvent ? selectedEvent.end.toISOString() : selectedEnd
+    selectedEvent
+      ? selectedEvent.end.toISOString()
+      : selectedEnd || new Date().toISOString()
   );
-  const [eventData, setEventData] = useState(null);
-
-  console.log("patients:", patients);
-  console.log("psychologists:", psychologists);
+  console.log("selectedevent", selectedEvent);
   useEffect(() => {
+    console.log("selectedEvent", selectedEvent);
     if (selectedEvent) {
-      setEventData({
-        patientId: selectedEvent.extendedProps.patient_id,
-        psychologistId: selectedEvent.extendedProps.psychologist_id,
-        status: selectedEvent.extendedProps.status,
-        notes: selectedEvent.extendedProps.notes,
-        priceCop: selectedEvent.extendedProps.price_cop,
-        start: selectedEvent.start.toISOString(),
-        end: selectedEvent.end.toISOString(),
-      });
+      setPatientId(selectedEvent.patient?.id || "");
+      setPsychologistId(selectedEvent.psychologist?.id || "");
+      setStatus(selectedEvent.status);
+      setNotes(selectedEvent.notes);
+      setPriceCop(selectedEvent.price_cop);
     } else {
-      setEventData(null);
+      setPatientId("");
+      setPsychologistId("");
+      setStatus("");
+      setNotes("");
+      setPriceCop("");
     }
   }, [selectedEvent]);
+  console.log("patients:", patients);
+  console.log("psychologists:", psychologists);
+
   const [error, setError] = useState(null);
   const [notesError, setNotesError] = useState("");
   const [statusError, setStatusError] = useState("");
@@ -193,39 +189,65 @@ const AppointmentForm = ({
           {" "}
           <form onSubmit={handleSubmit} className={classes.form}>
             {" "}
-            <Autocomplete
-              id="patientId"
-              options={patients}
-              getOptionLabel={(option) => (option ? option.name : "")}
-              value={patients.find((p) => p.id === patientId) || null}
-              onChange={(event, newValue) => {
-                setPatientId(newValue ? newValue.id : null);
-                if (newValue) {
-                  setPatientError("");
-                }
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Paciente" variant="outlined" />
-              )}
-            />{" "}
+            {selectedEvent &&
+            patients.length > 0 &&
+            psychologists.length > 0 ? (
+              <Typography>
+                Paciente:
+                {""}
+                {patients.find((p) => p.id === patientId)?.name || ""}
+              </Typography>
+            ) : (
+              <Autocomplete
+                id="patientId"
+                options={patients}
+                getOptionLabel={(option) => (option.id ? option.name : "")}
+                value={patients.find((p) => p.id === patientId) || null}
+                onChange={(event, newValue) => {
+                  setPatientId(newValue ? newValue.id : null);
+                  if (newValue) {
+                    setPatientError("");
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Paciente" variant="outlined" />
+                )}
+              />
+            )}
             {patientError && (
               <FormHelperText error>{patientError}</FormHelperText>
-            )}{" "}
-            <Autocomplete
-              id="psychologistId"
-              options={psychologists}
-              getOptionLabel={(option) => (option ? option.name : "")}
-              value={psychologists.find((p) => p.id === psychologistId) || null}
-              onChange={(event, newValue) => {
-                setPsychologistId(newValue ? newValue.id : null);
-                if (newValue) {
-                  setPsychologistError("");
+            )}
+            <br />{" "}
+            {selectedEvent &&
+            patients.length > 0 &&
+            psychologists.length > 0 ? (
+              <TextField
+                label="Psicólogo"
+                value={
+                  psychologists.find((p) => p.id === psychologistId)?.name || ""
                 }
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Psicólogo" variant="outlined" />
-              )}
-            />
+                inputProps={{ readOnly: true }}
+                variant="outlined"
+              />
+            ) : (
+              <Autocomplete
+                id="psychologistId"
+                options={psychologists}
+                getOptionLabel={(option) => (option.id ? option.name : "")}
+                value={
+                  psychologists.find((p) => p.id === psychologistId) || null
+                }
+                onChange={(event, newValue) => {
+                  setPsychologistId(newValue ? newValue.id : null);
+                  if (newValue) {
+                    setPsychologistError("");
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Psicólogo" variant="outlined" />
+                )}
+              />
+            )}
             {psychologistError && (
               <FormHelperText error>{psychologistError}</FormHelperText>
             )}{" "}

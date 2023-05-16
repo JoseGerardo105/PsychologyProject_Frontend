@@ -4,14 +4,13 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import { makeStyles, alpha } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import { formatDate } from "@fullcalendar/core";
 import esLocale from "@fullcalendar/core/locales/es";
 import AppointmentForm from "../components/AppointmentForm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import axiosClient from '../config/axios';
-
+import axiosClient from "../config/axios";
 
 const useStyles = makeStyles((theme) => ({
   homeContainer: {
@@ -27,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 class Home extends React.Component {
   state = {
+    isUpdateMode: false,
     weekendsVisible: true,
     currentEvents: [],
     locale: "es", //español por defecto
@@ -41,6 +41,16 @@ class Home extends React.Component {
     Promise.all([this.fetchPatients(), this.fetchPsychologists()]).then(() => {
       this.fetchAppointments();
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.selectedEvent !== this.state.selectedEvent &&
+      this.state.patients.length > 0 &&
+      this.state.psychologists.length > 0
+    ) {
+      this.setState({ isUpdateMode: true });
+    }
   }
 
   handleEventDidMount = (eventInfo) => {
@@ -62,20 +72,57 @@ class Home extends React.Component {
     }
   };
 
+  validatePatient = (patient) => {
+    if (!patient || !patient.id || !patient.name) {
+      return null;
+    }
+    return patient;
+  };
+
+  validatePsychologist = (psychologist) => {
+    if (!psychologist || !psychologist.id || !psychologist.name) {
+      return null;
+    }
+    return psychologist;
+  };
+
+  validateStatus = (status) => {
+    const validStatuses = ["active", "cancelled", "in_progress"];
+    if (!status || !validStatuses.includes(status)) {
+      return null;
+    }
+    return status;
+  };
+
+  validateNotes = (notes) => {
+    if (!notes || typeof notes !== "string") {
+      return null;
+    }
+    return notes;
+  };
+
+  validatePriceCop = (price_cop) => {
+    if (!price_cop || typeof price_cop !== "number") {
+      return null;
+    }
+    return price_cop;
+  };
+
   fetchAppointments = async () => {
     try {
-
-      const response = await axiosClient.get(
-        "/psychologists/get-appointments"
-      );
+      const response = await axiosClient.get("/psychologists/get-appointments");
       const appointments = response.data;
       console.log("Citas Cargadas cargados: ", appointments);
+
       const calendarEvents = appointments.map((appointment) => {
-        // Encuentra el paciente correspondiente al patient_id
-        const patient = this.state.patients.find(
-          (p) => p.id === appointment.patient_id
+        const patient = validatePatient(
+          this.state.patients.find((p) => p.id === appointment.patient_id)
         );
-        // Utiliza el nombre del paciente en el título del evento
+        const psychologist = validatePsychologist(
+          this.state.psychologists.find(
+            (p) => p.id === appointment.psychologist_id
+          )
+        );
         const title = patient
           ? `Cita con  ${patient.name}`
           : `Cita con  ${appointment.patient_id}`;
@@ -85,20 +132,22 @@ class Home extends React.Component {
           title,
           start: new Date(appointment.start_time),
           end: new Date(appointment.end_time),
-          status: appointment.status,
+          status: validateStatus(appointment.status),
+          patient: patient,
+          psychologist: psychologist,
+          notes: validateNotes(appointment.notes),
+          price_cop: validatePriceCop(appointment.price_cop),
         };
       });
+
       this.setState({ currentEvents: calendarEvents });
     } catch (error) {
       console.error("Error al obtener las citas:", error);
     }
   };
-
   fetchPatients = async () => {
     try {
-      const response = await axiosClient.get(
-        "/psychologists/get-patients"
-      );
+      const response = await axiosClient.get("/psychologists/get-patients");
       const patients = response.data;
       this.setState({ patients });
       console.log("Pacientes cargados: ", patients);
@@ -151,22 +200,20 @@ class Home extends React.Component {
     const price_cop = info.event.extendedProps.price_cop;
 
     try {
-      await axiosClient.patch(
-        `/psychologists/update-appointment/${eventId}`,
-        {
-          start_time: newStartTime,
-          end_time: newEndTime,
-          status,
-          notes,
-          price_cop,
-        }
-      );
+      await axiosClient.patch(`/psychologists/update-appointment/${eventId}`, {
+        start_time: newStartTime,
+        end_time: newEndTime,
+        status,
+        notes,
+        price_cop,
+      });
     } catch (error) {
       console.error("Error al actualizar la cita:", error);
     }
   };
   handleCloseAppointmentForm = () => {
     this.setState({
+      isUpdateMode: false,
       showAppointmentForm: false,
       selectedDate: null,
     });
@@ -184,19 +231,16 @@ class Home extends React.Component {
       price_cop,
     } = formData;
     try {
-      await axiosClient.post(
-        "/psychologists/create-appointment",
-        {
-          patient_id: patientId.id,
-          psychologist_id: psychologistId.id,
-          start_time: start,
-          end_time: end,
-          status: status,
-          notes: notes,
-          price_cop: price_cop,
-        }
-      );
-      console.log('cita creada')
+      await axiosClient.post("/psychologists/create-appointment", {
+        patient_id: patientId.id,
+        psychologist_id: psychologistId.id,
+        start_time: start,
+        end_time: end,
+        status: status,
+        notes: notes,
+        price_cop: price_cop,
+      });
+      console.log("cita creada");
     } catch (error) {
       console.error("Error al crear la cita:", error);
     }
@@ -221,9 +265,7 @@ class Home extends React.Component {
     const eventId = selectedEvent.id;
 
     try {
-      await axiosClient.delete(
-        `/psychologists/delete-appointment/${eventId}`
-      );
+      await axiosClient.delete(`/psychologists/delete-appointment/${eventId}`);
     } catch (error) {
       console.error("Error al eliminar la cita:", error);
     }
@@ -235,16 +277,13 @@ class Home extends React.Component {
   handleUpdateAppointment = async (selectedEvent, updatedData) => {
     const eventId = selectedEvent.id;
     try {
-      await axiosClient.patch(
-        `/psychologists/update-appointment-form/${eventId}`,
-        {
-          start_time: updatedData.start,
-          end_time: updatedData.end,
-          status: updatedData.status,
-          notes: updatedData.notes,
-          price_cop: updatedData.price_cop,
-        }
-      );
+      await axiosClient.patch(`/psychologists/update-appointment/${eventId}`, {
+        start_time: updatedData.start,
+        end_time: updatedData.end,
+        status: updatedData.status,
+        notes: updatedData.notes,
+        price_cop: updatedData.price_cop,
+      });
     } catch (error) {
       console.error("Error al actualizar la cita:", error);
     }
@@ -265,7 +304,7 @@ class Home extends React.Component {
     const eventId = selectedEvent.id;
     try {
       await axiosClient.patch(
-        `/psychologists/update-appointment/${eventId}`,
+        `/psychologists/update-appointment-form/${eventId}`,
         {
           start_time: updatedData.start,
           end_time: updatedData.end,
@@ -346,6 +385,7 @@ class Home extends React.Component {
           {this.state.showAppointmentForm && (
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <AppointmentForm
+                isUpdateMode={this.state.isUpdateMode}
                 open={this.state.showAppointmentForm}
                 onClose={this.handleCloseAppointmentForm}
                 onCreate={this.handleCreateAppointment}

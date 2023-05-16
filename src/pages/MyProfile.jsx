@@ -39,15 +39,6 @@ function MyProfile() {
           </div>
         </div>
       </form>
-      <nav>
-        <div>
-          <Link to="/home/change-password">
-            <h1 className="text-blue-900 block text-2xl font-bold text-center underline">
-              Cambiar contraseña
-            </h1>
-          </Link>
-        </div>
-      </nav>
     </>
   );
 }
