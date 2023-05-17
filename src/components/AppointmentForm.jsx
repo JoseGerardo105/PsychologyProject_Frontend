@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DateTimePicker } from "@material-ui/pickers";
 import { Autocomplete } from "@material-ui/lab";
-import { MenuItem, Typography } from "@material-ui/core";
+import { MenuItem } from "@material-ui/core";
 
 import {
   Dialog,
@@ -77,9 +77,8 @@ const AppointmentForm = ({
       ? selectedEvent.end.toISOString()
       : selectedEnd || new Date().toISOString()
   );
-  console.log("selectedevent", selectedEvent);
   useEffect(() => {
-    console.log("selectedEvent", selectedEvent);
+    console.log("selectedEvent en useEffect", selectedEvent);
     if (selectedEvent) {
       setPatientId(selectedEvent.patient?.id || "");
       setPsychologistId(selectedEvent.psychologist?.id || "");
@@ -94,8 +93,6 @@ const AppointmentForm = ({
       setPriceCop("");
     }
   }, [selectedEvent]);
-  console.log("patients:", patients);
-  console.log("psychologists:", psychologists);
 
   const [error, setError] = useState(null);
   const [notesError, setNotesError] = useState("");
@@ -155,7 +152,16 @@ const AppointmentForm = ({
     }
     if (!hasErrors) {
       if (selectedEvent) {
-        onUpdateWithButton(selectedEvent, eventData);
+        onUpdateWithButton({
+          ...selectedEvent,
+          start: dateTime,
+          end: endDateTime,
+          patient: patients.find((p) => p.id === patientId),
+          psychologist: psychologists.find((p) => p.id === psychologistId),
+          status,
+          notes,
+          price_cop,
+        });
       } else {
         const newPatient = patients.find((p) => p.id === patientId);
         const newPsychologist = psychologists.find(
@@ -192,11 +198,12 @@ const AppointmentForm = ({
             {selectedEvent &&
             patients.length > 0 &&
             psychologists.length > 0 ? (
-              <Typography>
-                Paciente:
-                {""}
-                {patients.find((p) => p.id === patientId)?.name || ""}
-              </Typography>
+              <TextField
+                label="Paciente"
+                value={patients.find((p) => p.id === patientId)?.name || ""}
+                inputProps={{ readOnly: true }}
+                variant="outlined"
+              />
             ) : (
               <Autocomplete
                 id="patientId"

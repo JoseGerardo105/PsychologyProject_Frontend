@@ -4,13 +4,15 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import { makeStyles } from "@material-ui/core/styles";
 import { formatDate } from "@fullcalendar/core";
+import { makeStyles } from "@material-ui/core/styles";
 import esLocale from "@fullcalendar/core/locales/es";
 import AppointmentForm from "../components/AppointmentForm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import axiosClient from "../config/axios";
+import { Snackbar } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 
 const useStyles = makeStyles((theme) => ({
   homeContainer: {
@@ -26,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
 
 class Home extends React.Component {
   state = {
+    snackbarOpen: false,
+    snackbarMessage: "",
+    snackbarSeverity: "success",
     isUpdateMode: false,
     weekendsVisible: true,
     currentEvents: [],
@@ -52,6 +57,13 @@ class Home extends React.Component {
       this.setState({ isUpdateMode: true });
     }
   }
+
+  handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    this.setState({ snackbarOpen: false });
+  };
 
   handleEventDidMount = (eventInfo) => {
     const status = eventInfo.event.extendedProps.status;
@@ -102,7 +114,7 @@ class Home extends React.Component {
   };
 
   validatePriceCop = (price_cop) => {
-    if (!price_cop || typeof price_cop !== "number") {
+    if (!price_cop) {
       return null;
     }
     return price_cop;
@@ -115,10 +127,10 @@ class Home extends React.Component {
       console.log("Citas Cargadas cargados: ", appointments);
 
       const calendarEvents = appointments.map((appointment) => {
-        const patient = validatePatient(
+        const patient = this.validatePatient(
           this.state.patients.find((p) => p.id === appointment.patient_id)
         );
-        const psychologist = validatePsychologist(
+        const psychologist = this.validatePsychologist(
           this.state.psychologists.find(
             (p) => p.id === appointment.psychologist_id
           )
@@ -132,11 +144,11 @@ class Home extends React.Component {
           title,
           start: new Date(appointment.start_time),
           end: new Date(appointment.end_time),
-          status: validateStatus(appointment.status),
+          status: this.validateStatus(appointment.status),
           patient: patient,
           psychologist: psychologist,
-          notes: validateNotes(appointment.notes),
-          price_cop: validatePriceCop(appointment.price_cop),
+          notes: this.validateNotes(appointment.notes),
+          price_cop: this.validatePriceCop(appointment.price_cop),
         };
       });
 
@@ -241,7 +253,17 @@ class Home extends React.Component {
         price_cop: price_cop,
       });
       console.log("cita creada");
+      this.setState({
+        snackbarOpen: true,
+        snackbarMessage: "Cita creada con éxito",
+        snackbarSeverity: "success",
+      });
     } catch (error) {
+      this.setState({
+        snackbarOpen: true,
+        snackbarMessage: "Error al crear la cita:",
+        snackbarSeverity: "error",
+      });
       console.error("Error al crear la cita:", error);
     }
     const calendarApi = this.calendarRef.current.getApi();
@@ -266,12 +288,23 @@ class Home extends React.Component {
 
     try {
       await axiosClient.delete(`/psychologists/delete-appointment/${eventId}`);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMessage: "Cita eliminada con éxito",
+        snackbarSeverity: "success",
+      });
     } catch (error) {
       console.error("Error al eliminar la cita:", error);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMessage: "Error al eliminar la cita:",
+        snackbarSeverity: "error",
+      });
     }
 
     const calendarApi = this.calendarRef.current.getApi();
-    selectedEvent.remove();
+    const event = calendarApi.getEventById(eventId);
+    event.remove();
   };
 
   handleUpdateAppointment = async (selectedEvent, updatedData) => {
@@ -286,6 +319,11 @@ class Home extends React.Component {
       });
     } catch (error) {
       console.error("Error al actualizar la cita:", error);
+      this.setState({
+        snackbarOpen: true,
+        snackbarMessage: "Error al actualizar la cita:",
+        snackbarSeverity: "error",
+      });
     }
     const calendarApi = this.calendarRef.current.getApi();
     selectedEvent.setProp(
@@ -300,8 +338,14 @@ class Home extends React.Component {
     calendarApi.updateEvent(selectedEvent);
   };
 
-  handleUpdateAppointmentWithButton = async (selectedEvent, updatedData) => {
-    const eventId = selectedEvent.id;
+  handleUpdateAppointmentWithButton = async (updatedData) => {
+    const eventId = updatedData?.id;
+
+    if (!eventId) {
+      console.error("No se pudo encontrar el ID del evento");
+      return;
+    }
+
     try {
       await axiosClient.patch(
         `/psychologists/update-appointment-form/${eventId}`,
@@ -313,10 +357,16 @@ class Home extends React.Component {
           price_cop: updatedData.price_cop,
         }
       );
+      this.setState({
+        snackbarOpen: true,
+        snackbarMessage: "Cita actualizada con éxito",
+        snackbarSeverity: "success",
+      });
     } catch (error) {
       console.error("Error al actualizar la cita:", error);
     }
     const calendarApi = this.calendarRef.current.getApi();
+    const selectedEvent = calendarApi.getEventById(eventId);
     selectedEvent.setProp(
       "title",
       `Cita con paciente ${updatedData.patient?.name}`
@@ -330,8 +380,22 @@ class Home extends React.Component {
   };
 
   handleEventClick = (clickInfo) => {
+    console.log("evento seleccionado", clickInfo.event);
+    const selectedEvent = {
+      id: clickInfo.event.id,
+      title: clickInfo.event.title,
+      start: clickInfo.event.start,
+      end: clickInfo.event.end,
+      allDay: clickInfo.event.allDay,
+      patient: clickInfo.event.extendedProps.patient,
+      psychologist: clickInfo.event.extendedProps.psychologist,
+      status: clickInfo.event.extendedProps.status,
+      notes: clickInfo.event.extendedProps.notes,
+      price_cop: clickInfo.event.extendedProps.price_cop,
+    };
+    console.log(clickInfo.event.extendedProps.price_cop);
     this.setState({
-      selectedEvent: clickInfo.event,
+      selectedEvent,
       selectedDate: clickInfo.event.start.toISOString(),
       selectedEnd: clickInfo.event.end.toISOString(),
       showAppointmentForm: true,
@@ -401,6 +465,19 @@ class Home extends React.Component {
               />
             </MuiPickersUtilsProvider>
           )}
+          <Snackbar
+            open={this.state.snackbarOpen}
+            autoHideDuration={3000}
+            onClose={this.handleSnackbarClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          >
+            <Alert
+              onClose={this.handleSnackbarClose}
+              severity={this.state.snackbarSeverity}
+            >
+              {this.state.snackbarMessage}
+            </Alert>
+          </Snackbar>
         </div>
       </div>
     );
