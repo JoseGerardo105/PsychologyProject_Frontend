@@ -341,6 +341,7 @@ class Home extends React.Component {
   handleUpdateAppointmentWithButton = async (updatedData) => {
     const eventId = updatedData?.id;
 
+    console.log(updatedData)
     if (!eventId) {
       console.error("No se pudo encontrar el ID del evento");
       return;
@@ -355,6 +356,8 @@ class Home extends React.Component {
           status: updatedData.status,
           notes: updatedData.notes,
           price_cop: updatedData.price_cop,
+          patient_id: updatedData.patient.id,
+          psychologist_id: updatedData.psychologist.id
         }
       );
       this.setState({
