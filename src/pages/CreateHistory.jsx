@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Autocomplete } from "@material-ui/lab";
 import { TextField } from "@material-ui/core";
 import axiosClient from "../config/axios";
+import Alerta from "../components/Alerta";
 const styles = { fontFamily: "Oleo Script" };
 
 const CreateHistory = () => {
@@ -18,6 +19,7 @@ const CreateHistory = () => {
   const [errors, setErrors] = useState({});
   const [patients, setPatients] = useState([]);
   const [patientError, setPatientError] = useState("");
+  const [alerta, setAlerta] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,9 +81,17 @@ const CreateHistory = () => {
         "/psychologists/create-medical-records",
         medicalRecordData
       );
+      setAlerta({
+        msg: "Historia creada exitosamente",
+        err: false,
+      });
       setErrors({});
     } catch (error) {
       setErrors({ submitError: "Error al crear la historia" });
+      setAlerta({
+        msg: "Hubo un error a la hora de crear la historia",
+        err: true,
+      });
     }
   };
 
@@ -100,6 +110,21 @@ const CreateHistory = () => {
   useEffect(() => {
     fetchPatients();
   }, []);
+
+  useEffect(() => {
+    if (alerta.msg) {
+      const timer = setTimeout(() => {
+        setAlerta({});
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [alerta]);
+
+  const { msg } = alerta;
+
   return (
     <>
       {" "}
@@ -107,6 +132,7 @@ const CreateHistory = () => {
         className="bg-gray-300 rounded-xl my-2 md:my-4 xl:my-4 w-full sm:w-12/12 md:w-11/12 lg:w-9/12 xl:w-8/12 mx-auto p-8 shadow-lg"
         onSubmit={handleSubmit}
       >
+        {msg && <Alerta alerta={alerta} />}
         {" "}
         <div>
           {" "}

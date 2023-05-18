@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axiosClient from "../config/axios";
 const styles = { fontFamily: "Oleo Script" };
 import { Delete } from "@material-ui/icons";
+import { Link } from "react-router-dom";
 
 class SearchHistory extends Component {
   constructor(props) {
@@ -44,6 +45,16 @@ class SearchHistory extends Component {
     this.fetchMedicalRecords();
   }
 
+  deleteHistory = async (id) => {
+    console.log("Id a borrar" + id);
+    try {
+      await axiosClient.delete(`/psychologists/delete-medical-record/${id}`);
+      this.fetchMedicalRecords();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   render() {
     const rowStyle = {
       backgroundColor: "#DEDEDE",
@@ -83,9 +94,13 @@ class SearchHistory extends Component {
               <tr key={index} style={rowStyle}>
                 <td className="border px-4 py-2">{dato.patient_name}</td>
                 <td className="border px-4 py-2">{dato.document_number}</td>
-                <td className="border px-4 py-2 underline">Ver historia</td>
+                <td className="border px-4 py-2 underline cursor-pointer">
+                <Link to ={`/home/watch-history?patientId=${dato.id}`}>
+                  Ver historia
+                </Link>
+                </td>
                 <td>
-                  <Delete />
+                <Delete className="cursor-pointer" onClick={() => this.deleteHistory(dato.id)}  />
                 </td>
               </tr>
             ))}

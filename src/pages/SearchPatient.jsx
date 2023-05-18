@@ -8,9 +8,11 @@ const SearchPatient = () => {
   const [datos, setDatos] = useState([]);
   const [isEditable, setIsEditable] = useState(false);
   const [value, setValue] = useState("");
-  const [id, setId] = useState("");
+  const [idToModify, setIdToModify] = useState("");
   const [type, setType] = useState("");
   const [alerta, setAlerta] = useState({});
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [idErase, setIdErase] = useState("");
 
   useEffect(() => {
     fetchPatients();
@@ -31,18 +33,24 @@ const SearchPatient = () => {
   const enableEdit = (id, type) => {
     console.log("Lo que entro fue: " + id + " " + type);
     setIsEditable(true);
-    setId(id);
+    setIdToModify(id);
     setType(type);
   };
 
   const edit = () => {
     setIsEditable(false);
+    editPatient();
   };
 
   const deletePatient = async (id) => {
-    console.log("Id a borrar" + id);
+    setShowConfirmation(true);
+    setIdErase(id);
+  };
+
+  const handleDelete = async () => {
+    console.log("Id a borrar" + idErase);
     try {
-      await axiosClient.delete(`/psychologists/delete-patient/${id}`);
+      await axiosClient.delete(`/psychologists/delete-patient/${idErase}`);
       fetchPatients();
       setAlerta({ msg: "Paciente eliminado exitosamente", err: false });
     } catch (error) {
@@ -72,13 +80,50 @@ const SearchPatient = () => {
 
   const handleNewValue = (event) => {
     setValue(event.target.value);
-    console.log("Nuevo valor " + value + "Id: " + id + "Campo: " + type);
   };
 
-  const editPatient = async (patientData) => {
+  const editPatient = async () => {
     try {
-      // Aca se implementa la logica del patch
+      switch (type) {
+        case "Nombre":
+          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
+            name: value
+          });
+          break;
+        case "Documento":
+          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
+            document_number: value
+          });
+          break;
+        case "Email":
+          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
+            email: value
+          });
+          break;
+        case "Telefono":
+          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
+            phone: value
+          });
+          break;
+        case "Direccion":
+          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
+            address: value
+          });
+          break;
+        default:
+          break;
+          
+      }
+      setAlerta({
+        msg: "Cambios guardados exitosamente.",
+        err: false,
+      });
+      fetchPatients();
     } catch (error) {
+      setAlerta({
+        msg: "Hubo un error en la edicion.",
+        err: true,
+      });
       throw error;
     }
   };
@@ -123,7 +168,7 @@ const SearchPatient = () => {
           {datos.map((dato, index) => (
             <tr key={index} style={rowStyle}>
               <td className="border px-4 py-2">
-                {isEditable && id == dato.id && type == "Nombre" ? (
+                {isEditable && idToModify == dato.id && type == "Nombre" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
                     type="text"
@@ -137,7 +182,7 @@ const SearchPatient = () => {
                 )}
               </td>
               <td className="border px-4 py-2">
-                {isEditable && id == dato.id && type == "Documento" ? (
+                {isEditable && idToModify == dato.id && type == "Documento" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
                     type="text"
@@ -151,7 +196,7 @@ const SearchPatient = () => {
                 )}
               </td>
               <td className="border px-4 py-2">
-                {isEditable && id == dato.id && type == "Email" ? (
+                {isEditable && idToModify == dato.id && type == "Email" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
                     type="text"
@@ -165,7 +210,7 @@ const SearchPatient = () => {
                 )}
               </td>
               <td className="border px-4 py-2">
-                {isEditable && id == dato.id && type == "Telefono" ? (
+                {isEditable && idToModify == dato.id && type == "Telefono" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
                     type="text"
@@ -179,7 +224,7 @@ const SearchPatient = () => {
                 )}
               </td>
               <td className="border px-4 py-2">
-                {isEditable && id == dato.id && type == "Direccion" ? (
+                {isEditable && idToModify == dato.id && type == "Direccion" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
                     type="text"
@@ -197,7 +242,7 @@ const SearchPatient = () => {
                   className="cursor-pointer float-left"
                   onClick={() => deletePatient(dato.id)}
                 />
-                {isEditable && id == dato.id ? (
+                {isEditable && idToModify == dato.id ? (
                   <Save className="cursor-pointer float-right" onClick={edit} />
                 ) : null}
               </td>
@@ -205,6 +250,32 @@ const SearchPatient = () => {
           ))}
         </tbody>
       </table>
+      
+      {showConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow">
+            <p className="mb-4">
+              Seguro de que quiere borrar el paciente? De la misma manera, todas
+              las citas e historias asociadas se eliminaran.
+            </p>
+            <div className="flex justify-end">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                onClick={handleDelete}
+              >
+                Sí
+              </button>
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+                onClick={() => setShowConfirmation(false)}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

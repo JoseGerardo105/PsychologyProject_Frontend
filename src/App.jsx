@@ -14,6 +14,7 @@ import MyProfile from "./pages/MyProfile";
 import Reports from "./pages/Reports";
 import ConfirmAccount from "./pages/ConfirmAccount";
 import ChangePasswordInAccount from "./pages/ChangePasswordInAccount";
+import WatchHistory from "./pages/WatchHistory";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="my-profile" element={<MyProfile />} />{" "}
           <Route path="stats" element={<Reports />} />{" "}
           <Route path="change-password" element={<ChangePasswordInAccount />} />{" "}
+          <Route path="watch-history" element={<WatchHistory />} />{" "}
         </Route>{" "}
       </Routes>{" "}
     </BrowserRouter>
