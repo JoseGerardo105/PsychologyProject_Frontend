@@ -132,8 +132,7 @@ const CreateHistory = () => {
         className="bg-gray-300 rounded-xl my-2 md:my-4 xl:my-4 w-full sm:w-12/12 md:w-11/12 lg:w-9/12 xl:w-8/12 mx-auto p-8 shadow-lg"
         onSubmit={handleSubmit}
       >
-        {msg && <Alerta alerta={alerta} />}
-        {" "}
+        {msg && <Alerta alerta={alerta} />}{" "}
         <div>
           {" "}
           <div>
@@ -163,8 +162,13 @@ const CreateHistory = () => {
                   getOptionLabel={(option) => (option ? option.name : "")}
                   value={patients.find((p) => p.id === patientId) || null}
                   onChange={(event, newValue) => {
+                    const fechaNacimiento = new Date(newValue.date_of_birth);
+                    const fechaFormateada = fechaNacimiento.toISOString().slice(0, 10);
+                    console.log(fechaFormateada)
                     setPatientId(newValue ? newValue.id : null);
                     setDoc(newValue ? newValue.document_number : "");
+                    setEdad(newValue ? fechaFormateada : "");
+
                     if (newValue) {
                       setPatientError("");
                     }
@@ -181,6 +185,7 @@ const CreateHistory = () => {
                   <p className="text-red-500 text-xs mt-1">{patientError}</p>
                 )}{" "}
               </div>{" "}
+
               <div className="w-5/12">
                 {" "}
                 <label className="text-black block text-xl font-bold">
@@ -201,6 +206,7 @@ const CreateHistory = () => {
               </div>{" "}
             </div>{" "}
           </div>{" "}
+
           <div className="my-5 mx-5">
             {" "}
             <div className="flex justify-between">
@@ -216,7 +222,8 @@ const CreateHistory = () => {
                   placeholder="Fecha de nacimiento"
                   className="border w-full p-3 mt-3 rounded-xl"
                   value={edad}
-                  onChange={(e) => setEdad(e.target.value)}
+                  readOnly
+                  // onChange={(e) => setEdad(e.target.value)}
                 />{" "}
                 {errors.edad && (
                   <p className="text-red-500 text-xs mt-1">{errors.edad}</p>

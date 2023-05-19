@@ -13,7 +13,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
@@ -27,7 +27,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if ([nombre, password].includes("")) {
-      setAlerta({ msg: "Hay valores vacios", err: true  });
+      setAlerta({ message: "Hay valores vacios", err: true  });
       console.log("Hay valores vacios");
       return;
     }
@@ -44,22 +44,22 @@ const Login = () => {
       if (response.data.token) {
         // Guarda el token en el almacenamiento local
         localStorage.setItem("token", response.data.token);
-        setAlerta({ msg: "Inicio de sesión exitoso", err: false });
+        setAlerta({ message: "Inicio de sesión exitoso", err: false });
         navigate("/home");
       } else {
-        setAlerta({ msg: "Error al iniciar sesión", err: true });
+        setAlerta({ message: "Error al iniciar sesión", err: true });
       }
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico desde el backend
-        setAlerta({ msg: error.response.data.error, err: true });
+        setAlerta({ message: error.response.data.error, err: true });
       } else {
-        setAlerta({ msg: "Error al iniciar sesión", err: true });
+        setAlerta({ message: "Error al iniciar sesión", err: true });
       }
     }
   };
-  const { msg } = alerta;
+  const { message } = alerta;
 
   return (
     <>
@@ -69,7 +69,7 @@ const Login = () => {
         onSubmit={handleSubmit}
       >
 
-        {msg && <Alerta alerta={alerta} />}
+        {message && <Alerta alerta={alerta} />}
         
         <div className="my-10 mx-5">
           <label className="text-white block text-xl font-bold">E-mail</label>

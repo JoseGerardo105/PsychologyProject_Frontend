@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosClient from '../config/axios';
+import axiosClient from "../config/axios";
 const styles = { fontFamily: "Oleo Script" };
-
 
 const RegisterPatient = () => {
   const [nombre, setNombre] = useState("");
   const [tipodoc, setTipoDoc] = useState(1);
+  const [edad, setEdad] = useState("");
   const [documento, setDocumento] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
@@ -18,12 +18,9 @@ const RegisterPatient = () => {
 
   const createPatient = async (patientData) => {
     try {
-      const url = '/psychologists/create-patients';
+      const url = "/psychologists/create-patients";
 
-      const response = await axiosClient.post(
-        url,
-        patientData
-      );
+      const response = await axiosClient.post(url, patientData);
       if (response.status !== 201) {
         throw new Error("Error al crear el paciente");
       }
@@ -41,6 +38,13 @@ const RegisterPatient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let errorMessages = {};
+    const today = new Date();
+    const birthDate = new Date(edad);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
     if (!nombre.trim()) {
       errorMessages.nombre = "El nombre es obligatorio";
     }
@@ -48,6 +52,11 @@ const RegisterPatient = () => {
       errorMessages.documento = "El documento es obligatorio";
     } else if (tipodoc !== 4 && isNaN(documento)) {
       errorMessages.documento = "El documento debe ser un número";
+    }
+    if (!edad.trim()) {
+      errorMessages.edad = "La fecha de nacimiento es obligatoria";
+    } else if (age < 18) {
+      errorMessages.age = "La edad mínima permitida es 18 años";
     }
     if (!email.trim()) {
       errorMessages.email = "El correo electrónico es obligatorio";
@@ -71,6 +80,7 @@ const RegisterPatient = () => {
       nombre,
       tipodoc,
       documento,
+      date_of_birth: edad,
       email,
       telefono,
       direccion,
@@ -142,6 +152,26 @@ const RegisterPatient = () => {
           {errors.documento && (
             <p className="text-red-500 text-xs mt-1">{errors.documento}</p>
           )}{" "}
+        </div>{" "}
+        <div className="my-5 mx-5">
+          {" "}
+          <label className="text-black block text-xl font-bold">
+            Fecha de nacimiento
+          </label>{" "}
+          <input
+            type="date"
+            placeholder="Fecha nacimiento"
+            className="border w-full p-3 mt-3 rounded-xl"
+            value={edad}
+            onChange={(e) => setEdad(e.target.value)}
+          />{" "}
+          {errors.edad && (
+            <p className="text-red-500 text-xs mt-1">{errors.edad}</p>
+          )}
+          {/* {" "} */}
+          {errors.age && (
+            <p className="text-red-500 text-xs mt-1">{errors.age}</p>
+          )}
         </div>{" "}
         <div className="my-5 mx-5">
           {" "}

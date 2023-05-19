@@ -19,7 +19,7 @@ const SearchPatient = () => {
   }, []);
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
@@ -52,10 +52,10 @@ const SearchPatient = () => {
     try {
       await axiosClient.delete(`/psychologists/delete-patient/${idErase}`);
       fetchPatients();
-      setAlerta({ msg: "Paciente eliminado exitosamente", err: false });
+      setAlerta({ message: "Paciente eliminado exitosamente", err: false });
     } catch (error) {
       setAlerta({
-        msg: "Hubo un error a la hora de eliminar el paciente",
+        message: "Hubo un error a la hora de eliminar el paciente",
         err: true,
       });
       throw error;
@@ -128,11 +128,11 @@ const SearchPatient = () => {
     }
   };
 
-  const { msg } = alerta;
+  const { message } = alerta;
 
   return (
     <div>
-      {msg && <Alerta alerta={alerta} />}
+      {message && <Alerta alerta={alerta} />}
       <h1
         className="text-indigo-900 block text-6xl font-bold text-center float-left "
         style={styles}

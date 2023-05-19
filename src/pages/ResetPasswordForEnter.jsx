@@ -18,11 +18,11 @@ const ResetPasswordForEnter = () => {
       try {
         const url = `/psychologists/change-password/${token}`;
         await axiosClient(url);
-        setAlerta({ msg: "Coloca tu nueva contraseña" });
+        setAlerta({ message: "Coloca tu nueva contraseña" });
         setValidToken(true);
       } catch (error) {
         setAlerta({
-          msg: "Hubo un error con el enlace",
+          message: "Hubo un error con el enlace",
           err: true,
         });
       }
@@ -32,7 +32,7 @@ const ResetPasswordForEnter = () => {
   }, []);
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
@@ -46,12 +46,12 @@ const ResetPasswordForEnter = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== rewritePassword) {
-      setAlerta({ msg: "Las contraseñas no coinciden. ", err: true });
+      setAlerta({ message: "Las contraseñas no coinciden. ", err: true });
       return;
     }
     if (password.length < 8) {
       setAlerta({
-        msg: "La contraseña no es lo suficientemente larga. Debe tener minimo 8 caracteres",
+        message: "La contraseña no es lo suficientemente larga. Debe tener minimo 8 caracteres",
         err: true,
       });
       return;
@@ -61,14 +61,14 @@ const ResetPasswordForEnter = () => {
       const url = `/psychologists/change-password/${token}`;
       const { data } = await axiosClient.post(url, { password });
       setAlerta({
-        msg: data.msg,
+        message: data.message,
       });
-    setAlerta({ msg: "Contraseña modificada correctamente", err: false });
+    setAlerta({ message: "Contraseña modificada correctamente", err: false });
 
       setChangedPassword(true);
     } catch (error) {
       setAlerta({
-        msg: error.response.data.msg,
+        message: error.response.data.message,
         err: true,
       });
     }
@@ -77,7 +77,7 @@ const ResetPasswordForEnter = () => {
 
   return (
     <div style={{ height: "70vh" }}>
-      {alerta.msg && <Alerta alerta={alerta} />}
+      {alerta.message && <Alerta alerta={alerta} />}
 
       <div
         style={{

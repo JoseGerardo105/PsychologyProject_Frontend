@@ -10,7 +10,7 @@ const MailForPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
@@ -25,11 +25,11 @@ const MailForPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) {
-      setAlerta({ msg: "Se requiere correo electrónico", err:true });
+      setAlerta({ message: "Se requiere correo electrónico", err:true });
       return;
     }
     if (!email.includes("@") || !email.includes(".")) {
-      setAlerta({ msg: "Ingrese un correo electrónico válido", err:true});
+      setAlerta({ message: "Ingrese un correo electrónico válido", err:true});
       return;
     }
     try {
@@ -40,18 +40,18 @@ const MailForPassword = () => {
         { email: email }
       );
 
-      if (response.data.msg) {
-        setAlerta({ msg: response.data.msg });
+      if (response.data.message) {
+        setAlerta({ message: response.data.message });
       } else {
-        setAlerta({ msg: "Error al enviar las instrucciones"});
+        setAlerta({ message: "Error al enviar las instrucciones"});
       }
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico desde el backend
-        setAlerta({ msg: error.response.data.error, err:true });
+        setAlerta({ message: error.response.data.error, err:true });
       } else {
-        setAlerta({ msg: "Error al enviar las instrucciones", err:true });
+        setAlerta({ message: "Error al enviar las instrucciones", err:true });
       }
     }
   };

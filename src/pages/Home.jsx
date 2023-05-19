@@ -124,7 +124,6 @@ class Home extends React.Component {
     try {
       const response = await axiosClient.get("/psychologists/get-appointments");
       const appointments = response.data;
-      console.log("Citas Cargadas cargados: ", appointments);
 
       const calendarEvents = appointments.map((appointment) => {
         const patient = this.validatePatient(
@@ -162,7 +161,6 @@ class Home extends React.Component {
       const response = await axiosClient.get("/psychologists/get-patients");
       const patients = response.data;
       this.setState({ patients });
-      console.log("Pacientes cargados: ", patients);
       return patients;
     } catch (error) {
       console.error("Error al obtener los pacientes:", error);
@@ -176,7 +174,6 @@ class Home extends React.Component {
       );
       const psychologists = response.data;
       this.setState({ psychologists });
-      console.log("Psicologos cargados: ", psychologists);
       return psychologists;
     } catch (error) {
       console.error("Error al obtener los Psicólogos:", error);
@@ -210,6 +207,8 @@ class Home extends React.Component {
     const status = info.event.extendedProps.status;
     const notes = info.event.extendedProps.notes;
     const price_cop = info.event.extendedProps.price_cop;
+    const patient_id = info.event.extendedProps.patient.id;
+    const psychologist_id = info.event.extendedProps.psychologist.id;
 
     try {
       await axiosClient.patch(`/psychologists/update-appointment/${eventId}`, {
@@ -218,6 +217,8 @@ class Home extends React.Component {
         status,
         notes,
         price_cop,
+        patient_id,
+        psychologist_id
       });
     } catch (error) {
       console.error("Error al actualizar la cita:", error);
@@ -252,7 +253,6 @@ class Home extends React.Component {
         notes: notes,
         price_cop: price_cop,
       });
-      console.log("cita creada");
       this.setState({
         snackbarOpen: true,
         snackbarMessage: "Cita creada con éxito",
@@ -307,41 +307,40 @@ class Home extends React.Component {
     event.remove();
   };
 
-  handleUpdateAppointment = async (selectedEvent, updatedData) => {
-    const eventId = selectedEvent.id;
-    try {
-      await axiosClient.patch(`/psychologists/update-appointment/${eventId}`, {
-        start_time: updatedData.start,
-        end_time: updatedData.end,
-        status: updatedData.status,
-        notes: updatedData.notes,
-        price_cop: updatedData.price_cop,
-      });
-    } catch (error) {
-      console.error("Error al actualizar la cita:", error);
-      this.setState({
-        snackbarOpen: true,
-        snackbarMessage: "Error al actualizar la cita:",
-        snackbarSeverity: "error",
-      });
-    }
-    const calendarApi = this.calendarRef.current.getApi();
-    selectedEvent.setProp(
-      "title",
-      `Cita con paciente ${updatedData.patient.name}`
-    );
-    selectedEvent.setStart(updatedData.start);
-    selectedEvent.setEnd(updatedData.end);
-    selectedEvent.setExtendedProp("status", updatedData.status);
-    selectedEvent.setExtendedProp("notes", updatedData.notes);
-    selectedEvent.setExtendedProp("price_cop", updatedData.price_cop);
-    calendarApi.updateEvent(selectedEvent);
-  };
+  // handleUpdateAppointment = async (selectedEvent, updatedData) => {
+  //   const eventId = selectedEvent.id;
+  //   console.log(updatedData)
+  //   try {
+  //     await axiosClient.patch(`/psychologists/update-appointment/${eventId}`, {
+  //       start_time: updatedData.start,
+  //       end_time: updatedData.end,
+  //       status: updatedData.status,
+  //       notes: updatedData.notes,
+  //       price_cop: updatedData.price_cop,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error al actualizar la cita:", error);
+  //     this.setState({
+  //       snackbarOpen: true,
+  //       snackbarMessage: "Error al actualizar la cita:",
+  //       snackbarSeverity: "error",
+  //     });
+  //   }
+  //   const calendarApi = this.calendarRef.current.getApi();
+  //   selectedEvent.setProp(
+  //     "title",
+  //     `Cita con paciente ${updatedData.patient.name}`
+  //   );
+  //   selectedEvent.setStart(updatedData.start);
+  //   selectedEvent.setEnd(updatedData.end);
+  //   selectedEvent.setExtendedProp("status", updatedData.status);
+  //   selectedEvent.setExtendedProp("notes", updatedData.notes);
+  //   selectedEvent.setExtendedProp("price_cop", updatedData.price_cop);
+  //   calendarApi.updateEvent(selectedEvent);
+  // };
 
   handleUpdateAppointmentWithButton = async (updatedData) => {
     const eventId = updatedData?.id;
-
-    console.log(updatedData)
     if (!eventId) {
       console.error("No se pudo encontrar el ID del evento");
       return;
@@ -383,7 +382,6 @@ class Home extends React.Component {
   };
 
   handleEventClick = (clickInfo) => {
-    console.log("evento seleccionado", clickInfo.event);
     const selectedEvent = {
       id: clickInfo.event.id,
       title: clickInfo.event.title,
@@ -396,7 +394,6 @@ class Home extends React.Component {
       notes: clickInfo.event.extendedProps.notes,
       price_cop: clickInfo.event.extendedProps.price_cop,
     };
-    console.log(clickInfo.event.extendedProps.price_cop);
     this.setState({
       selectedEvent,
       selectedDate: clickInfo.event.start.toISOString(),

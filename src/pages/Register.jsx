@@ -15,7 +15,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
@@ -33,19 +33,19 @@ const Register = () => {
     console.log(password);
     console.log(repetirPassword);
     if ([nombre, email, password, repetirPassword].includes("")) {
-      setAlerta({ msg: "Hay valores vacios", err: true });
+      setAlerta({ message: "Hay valores vacios", err: true });
       console.log("Hay valores vacios");
       return;
     }
 
     if (password !== repetirPassword) {
-      setAlerta({ msg: "Las contraseñas no coinciden. ", err: true });
+      setAlerta({ message: "Las contraseñas no coinciden. ", err: true });
       console.log("Las contraseñas no coinciden.");
       return;
     }
     if (password.length < 8) {
       setAlerta({
-        msg: "La contraseña no es lo suficientemente larga. Debe tener minimo 8 caracteres", err: true
+        message: "La contraseña no es lo suficientemente larga. Debe tener minimo 8 caracteres", err: true
       });
       return;
     }
@@ -61,23 +61,23 @@ const Register = () => {
       );
 
       if (response.data.message) {
-        setAlerta({ msg: "Cuenta creada exitosamente revisa tu email para confirmar registro" , err: false});
+        setAlerta({ message: "Cuenta creada exitosamente revisa tu email para confirmar registro" , err: false});
         // navigate("/");
       } else {
-        setAlerta({ msg: "Error al crear cuenta" , err: true});
+        setAlerta({ message: "Error al crear cuenta" , err: true});
       }
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico del back
-        setAlerta({ msg: error.response.data.error });
+        setAlerta({ message: error.response.data.error });
       } else {
-        setAlerta({ msg: "Error al crear cuenta" , err: true});
+        setAlerta({ message: "Error al crear cuenta" , err: true});
       }
     }
   };
 
-  const { msg } = alerta;
+  const { message } = alerta;
 
   return (
     <>
@@ -86,7 +86,7 @@ const Register = () => {
         className="bg-blue-900 rounded-xl my-1 md:my-2 xl:my-4 w-full sm:w-full md:w-full lg:w-7/8 xl:w-3/4 2xl:w-max 2xl:max-w-xl mx-auto p-8 shadow-lg"
         onSubmit={handleSubmit}
       >
-        {msg && <Alerta alerta={alerta} />}
+        {message && <Alerta alerta={alerta} />}
         <div className="my-10 mx-5">
           <label className="text-white block text-xl font-bold">Nombre</label>
           <input

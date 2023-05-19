@@ -19,11 +19,11 @@ function ConfirmAccount() {
         const { data } = await axiosClient(url);
         setConfirmAccount(true);
         setAlerta({
-          msg: data.msg,
+          message: data.message,
         });
       } catch (error) {
         setAlerta({
-          msg: "Error, el token ingresado no existe",
+          message: "Error, el token ingresado no existe",
           err: true,
         });
       }
@@ -35,7 +35,7 @@ function ConfirmAccount() {
   }, []);
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
