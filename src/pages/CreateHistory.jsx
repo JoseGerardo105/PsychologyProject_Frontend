@@ -67,8 +67,6 @@ const CreateHistory = () => {
     try {
       const medicalRecordData = {
         patient_id: newPatient.id,
-        document_number: newPatient.document_number,
-        date_of_birth: edad,
         ocupation: ocupacion,
         gender: genero,
         marital_status: estadocivil,

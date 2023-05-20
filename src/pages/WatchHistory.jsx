@@ -10,10 +10,10 @@ const WatchHistory = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const patientId = queryParams.get("patientId");
-
   const [datos, setDatos] = useState([]);
   const [pac, setPac] = useState([]);
   const [nombre, setNombre] = useState("");
+  const [doc, setDoc] = useState("");
   const [fechaNac, setFecha] = useState("");
   const [isEditable, setIsEditable] = useState(false);
   const [type, setType] = useState("");
@@ -44,7 +44,6 @@ const WatchHistory = () => {
 
   const edit = async () => {
     try {
-      console.log(`/psychologists/update-medical-records/${patientId}`);
       switch (type) {
         case "ocupacion":
           await axiosClient.patch(
@@ -102,7 +101,6 @@ const WatchHistory = () => {
             }
           );
           break;
-
         default:
           break;
       }
@@ -148,16 +146,23 @@ const WatchHistory = () => {
   };
 
   useEffect(() => {
-    if (datos.date_of_birth) {
-      setFecha(datos.date_of_birth.toString().substring(0, 10));
-    }
+    // if (datos.date_of_birth) {
+    //   setFecha(datos.date_of_birth.toString().substring(0, 10));
+    // }
     if (pac.name) {
       setNombre(pac.name);
+    }
+    if (pac.document_number) {
+      setDoc(pac.document_number);
+    }
+    if (pac.date_of_birth) {
+      let fecha = new Date(pac.date_of_birth);
+      let fechaFormateada = fecha.toLocaleDateString('es-ES');
+      setFecha(fechaFormateada);
     }
   }, [datos, pac]);
 
   const { msg } = alerta;
-
   return (
     <div>
       <>
@@ -213,7 +218,7 @@ const WatchHistory = () => {
             />
             <input
               type="text"
-              defaultValue={datos.document_number}
+              defaultValue={doc}
               className="border w-72 p-3 mt-3 rounded-xl float-right"
               disabled
             />

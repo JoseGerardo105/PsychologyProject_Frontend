@@ -12,14 +12,13 @@ class SearchHistory extends Component {
     };
   }
 
-  fetchPatientName = async (patientId) => {
+  fetchPatient = async (patientId) => {
     try {
       const response = await axiosClient.get(
         `/psychologists/get-patient/${patientId}`
       );
       const patient = response.data;
-      console.log("nombre del pacienre", patient.name);
-      return patient.name;
+      return patient;
     } catch (error) {
       console.error("Error al obtener el paciente:", error);
       return null;
@@ -31,10 +30,15 @@ class SearchHistory extends Component {
         "/psychologists/get-medical-records"
       );
       const medicalRecords = response.data;
+      let medicalRecordsInfo=[];
+      console.log(medicalRecords)
       for (let record of medicalRecords) {
-        record.patient_name = await this.fetchPatientName(record.patient_id);
+        // record.patient_name = await this.fetchPatient(record.patient_id);
+        let response = await this.fetchPatient(record.patient_id);
+        medicalRecordsInfo.push(response);
       }
-      this.setState({ datos: medicalRecords });
+
+      this.setState({ datos: medicalRecordsInfo });
       return medicalRecords;
     } catch (error) {
       console.error("Error al obtener los registros medicos:", error);
@@ -54,6 +58,8 @@ class SearchHistory extends Component {
       throw error;
     }
   };
+
+  
 
   render() {
     const rowStyle = {
@@ -89,10 +95,11 @@ class SearchHistory extends Component {
               <th className="px-4 py-2">Historias</th>
             </tr>
           </thead>
+          
           <tbody className=" bg-slate-500">
             {this.state.datos.map((dato, index) => (
               <tr key={index} style={rowStyle}>
-                <td className="border px-4 py-2">{dato.patient_name}</td>
+                <td className="border px-4 py-2">{dato.name}</td>
                 <td className="border px-4 py-2">{dato.document_number}</td>
                 <td className="border px-4 py-2 underline cursor-pointer">
                 <Link to ={`/home/watch-history?patientId=${dato.id}`}>
