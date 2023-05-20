@@ -80,14 +80,14 @@ const CreateHistory = () => {
         medicalRecordData
       );
       setAlerta({
-        msg: "Historia creada exitosamente",
+        message: "Historia creada exitosamente",
         err: false,
       });
       setErrors({});
     } catch (error) {
       setErrors({ submitError: "Error al crear la historia" });
       setAlerta({
-        msg: "Hubo un error a la hora de crear la historia",
+        message: "Hubo un error a la hora de crear la historia",
         err: true,
       });
     }
@@ -110,7 +110,7 @@ const CreateHistory = () => {
   }, []);
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
@@ -121,7 +121,7 @@ const CreateHistory = () => {
     }
   }, [alerta]);
 
-  const { msg } = alerta;
+  const { message } = alerta;
 
   return (
     <>
@@ -130,7 +130,7 @@ const CreateHistory = () => {
         className="bg-gray-300 rounded-xl my-2 md:my-4 xl:my-4 w-full sm:w-12/12 md:w-11/12 lg:w-9/12 xl:w-8/12 mx-auto p-8 shadow-lg"
         onSubmit={handleSubmit}
       >
-        {msg && <Alerta alerta={alerta} />}{" "}
+        {message && <Alerta alerta={alerta} />}{" "}
         <div>
           {" "}
           <div>

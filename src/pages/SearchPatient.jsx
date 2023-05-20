@@ -31,7 +31,6 @@ const SearchPatient = () => {
   }, [alerta]);
 
   const enableEdit = (id, type) => {
-    console.log("Lo que entro fue: " + id + " " + type);
     setIsEditable(true);
     setIdToModify(id);
     setType(type);
@@ -48,7 +47,6 @@ const SearchPatient = () => {
   };
 
   const handleDelete = async () => {
-    console.log("Id a borrar" + idErase);
     try {
       await axiosClient.delete(`/psychologists/delete-patient/${idErase}`);
       fetchPatients();
@@ -66,9 +64,7 @@ const SearchPatient = () => {
     try {
       const response = await axiosClient.get("/psychologists/get-patients");
       const patients = response.data;
-      console.log("estructura de pacientes:", patients[0]);
       setDatos(patients);
-      console.log("Pacientes cargados: ", patients);
     } catch (error) {
       console.error("Error al obtener los pacientes:", error);
     }
@@ -115,13 +111,13 @@ const SearchPatient = () => {
           
       }
       setAlerta({
-        msg: "Cambios guardados exitosamente.",
+        message: "Cambios guardados exitosamente.",
         err: false,
       });
       fetchPatients();
     } catch (error) {
       setAlerta({
-        msg: "Hubo un error en la edicion.",
+        message: "Hubo un error en la edicion.",
         err: true,
       });
       throw error;

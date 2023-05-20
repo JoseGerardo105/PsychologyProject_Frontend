@@ -25,7 +25,7 @@ const WatchHistory = () => {
   }, []);
 
   useEffect(() => {
-    if (alerta.msg) {
+    if (alerta.message) {
       const timer = setTimeout(() => {
         setAlerta({});
       }, 3000);
@@ -105,19 +105,18 @@ const WatchHistory = () => {
           break;
       }
       setAlerta({
-        msg: "Cambios en la historia guardados exitosamente.",
+        message: "Cambios en la historia guardados exitosamente.",
         err: false,
       });
       fetchData();
     } catch (error) {
       setAlerta({
-        msg: "Hubo un error en la edicion de la historia.",
+        message: "Hubo un error en la edicion de la historia.",
         err: true,
       });
       throw error;
     }
     setIsEditable(false);
-    console.log("Campo a modificar: " + type + " valor: " + value);
   };
 
   const fetchData = async () => {
@@ -125,6 +124,7 @@ const WatchHistory = () => {
       const response = await axiosClient.get(
         `psychologists/get-medical-record/${patientId}`
       );
+
       const record = response.data;
       setDatos(record);
       await chargePatientName(record.patientid);
@@ -162,7 +162,7 @@ const WatchHistory = () => {
     }
   }, [datos, pac]);
 
-  const { msg } = alerta;
+  const { message } = alerta;
   return (
     <div>
       <>
@@ -170,7 +170,7 @@ const WatchHistory = () => {
           classaction=""
           className="bg-gray-300 rounded-xl my-2 md:my-4 xl:my-4 w-full sm:w-12/12 md:w-11/12 lg:w-9/12 xl:w-8/12 mx-auto p-8 shadow-lg"
         >
-          {msg && <Alerta alerta={alerta} />}
+          {message && <Alerta alerta={alerta} />}
           <div>
             <h1
               className="text-black block text-8xl font-bold text-center "

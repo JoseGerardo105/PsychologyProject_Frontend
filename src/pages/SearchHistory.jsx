@@ -30,15 +30,13 @@ class SearchHistory extends Component {
         "/psychologists/get-medical-records"
       );
       const medicalRecords = response.data;
-      let medicalRecordsInfo=[];
-      console.log(medicalRecords)
       for (let record of medicalRecords) {
-        // record.patient_name = await this.fetchPatient(record.patient_id);
-        let response = await this.fetchPatient(record.patient_id);
-        medicalRecordsInfo.push(response);
+        let patient = await this.fetchPatient(record.patient_id);
+        record.name = patient.name;
+        record.document_number = patient.document_number;
       }
 
-      this.setState({ datos: medicalRecordsInfo });
+      this.setState({ datos: medicalRecords });
       return medicalRecords;
     } catch (error) {
       console.error("Error al obtener los registros medicos:", error);
@@ -50,7 +48,6 @@ class SearchHistory extends Component {
   }
 
   deleteHistory = async (id) => {
-    console.log("Id a borrar" + id);
     try {
       await axiosClient.delete(`/psychologists/delete-medical-record/${id}`);
       this.fetchMedicalRecords();
