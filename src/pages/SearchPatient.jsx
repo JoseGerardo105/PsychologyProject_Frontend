@@ -13,6 +13,7 @@ const SearchPatient = () => {
   const [alerta, setAlerta] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [idErase, setIdErase] = useState("");
+  const [docToSearch, setDocToSearch] = useState("");
 
   useEffect(() => {
     fetchPatients();
@@ -29,6 +30,14 @@ const SearchPatient = () => {
       };
     }
   }, [alerta]);
+
+  const search = () => {
+    if (docToSearch !== "") {
+      fetchPatient(docToSearch);
+    }else{
+      fetchPatients();
+    }
+  };
 
   const enableEdit = (id, type) => {
     setIsEditable(true);
@@ -70,6 +79,24 @@ const SearchPatient = () => {
     }
   };
 
+  const fetchPatient = async (document) => {
+    try {
+      const response = await axiosClient.get(`/psychologists/get-patient-with-doc/${document}`);
+      const patient = response.data;
+      if (Object.keys(patient).length === 0) {
+        throw error;
+      }else{
+        setDatos([patient]);
+      }
+    } catch (error) {
+      console.error("Error al obtener los pacientes:", error);
+      setAlerta({
+        message: "El paciente no esta registrado",
+        err: true,
+      });
+    }
+  };
+
   const rowStyle = {
     backgroundColor: "#DEDEDE",
   };
@@ -77,6 +104,7 @@ const SearchPatient = () => {
   const handleNewValue = (event) => {
     setValue(event.target.value);
   };
+
 
   const editPatient = async () => {
     try {
@@ -92,9 +120,13 @@ const SearchPatient = () => {
           });
           break;
         case "Email":
-          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
-            email: value
-          });
+          if (/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
+            await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
+              email: value
+            });
+          }else{
+            throw error;
+          }
           break;
         case "Telefono":
           await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
@@ -136,18 +168,18 @@ const SearchPatient = () => {
         Mis <span className="text-black">pacientes</span>
       </h1>
       <div className="float-right w-1/3 focus:outline-none py-2 px-4">
-        <form action="">
+    
           <input
             type="text"
             placeholder="Buscar"
             className=" border w-3/5 p-3  rounded-xl focus:ring-indigo-500 focus:border-indigo-500 mt-5 h-10"
+            onChange={(e) => setDocToSearch(e.target.value)}
           />
-          <input
-            type="submit"
-            value="Buscar paciente"
+          <button
             className="bg-black text-white my-5 mx-auto w-1/3 h-10 rounded-xl font-normal mt-5 hover:cursor-pointer hover:bg-gray-200 float-right"
-          />
-        </form>
+            onClick={() => search()}
+          >Buscar paciente</button>
+  
       </div>
 
       <table className="table-auto border rounded-xl w-full border-gray-400 px-4 py-2 bg-gray-100 text-gray-800 text-center text-base flex-col sm:flex-row">
@@ -181,7 +213,7 @@ const SearchPatient = () => {
                 {isEditable && idToModify == dato.id && type == "Documento" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
-                    type="text"
+                    type="number"
                     defaultValue={dato.document_number}
                     onChange={handleNewValue}
                   ></input>
@@ -195,7 +227,7 @@ const SearchPatient = () => {
                 {isEditable && idToModify == dato.id && type == "Email" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
-                    type="text"
+                    type="email"
                     defaultValue={dato.email}
                     onChange={handleNewValue}
                   ></input>
@@ -209,7 +241,7 @@ const SearchPatient = () => {
                 {isEditable && idToModify == dato.id && type == "Telefono" ? (
                   <input
                     className="w-full h-full border-collapse rounded-xl text-center"
-                    type="text"
+                    type="number"
                     defaultValue={dato.phone}
                     onChange={handleNewValue}
                   ></input>
