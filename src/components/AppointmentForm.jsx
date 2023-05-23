@@ -62,6 +62,7 @@ const AppointmentForm = ({
   psychologists,
 }) => {
   const classes = useStyles();
+  const [userRole, setUserRole] = useState("");
   const [patientId, setPatientId] = useState("");
   const [psychologistId, setPsychologistId] = useState("");
   const [status, setStatus] = useState("");
@@ -79,6 +80,8 @@ const AppointmentForm = ({
   );
   useEffect(() => {
     console.log("selectedEvent en useEffect", selectedEvent);
+    const role = localStorage.getItem("role");
+    setUserRole(role);
     if (selectedEvent) {
       setPatientId(selectedEvent.patient?.id || "");
       setPsychologistId(selectedEvent.psychologist?.id || "");

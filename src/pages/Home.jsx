@@ -44,7 +44,7 @@ class Home extends React.Component {
 
   componentDidMount() {
     Promise.all([this.fetchPatients(), this.fetchPsychologists()]).then(() => {
-      this.fetchAppointments();
+      this.loadAppointments();
     });
   }
 
@@ -120,6 +120,53 @@ class Home extends React.Component {
     return price_cop;
   };
 
+  fetchUserAppointments = async () => {
+    try {
+      const response = await axiosClient.get(
+        "/psychologists/get-user-appointments"
+      );
+      const appointments = response.data;
+
+      // Usa appointments directamente para crear calendarEvents
+      const calendarEvents = appointments.map((appointment) => {
+        const patient = this.validatePatient(
+          this.state.patients.find((p) => p.id === appointment.patient_id)
+        );
+        const psychologist = this.validatePsychologist(
+          this.state.psychologists.find(
+            (p) => p.id === appointment.psychologist_id
+          )
+        );
+        const title = patient
+          ? `Cita con ${patient.name}`
+          : `Cita con ${appointment.patient_id}`;
+        return {
+          id: appointment.id,
+          title,
+          start: new Date(appointment.start_time),
+          end: new Date(appointment.end_time),
+          status: this.validateStatus(appointment.status),
+          patient: patient,
+          psychologist: psychologist,
+          notes: this.validateNotes(appointment.notes),
+          price_cop: this.validatePriceCop(appointment.price_cop),
+        };
+      });
+      this.setState({ currentEvents: calendarEvents });
+    } catch (error) {
+      console.error("Error al obtener las citas del usuario:", error);
+    }
+  };
+
+  loadAppointments = async () => {
+    const userRole = localStorage.getItem("role");
+    if (userRole === "administrador") {
+      await this.fetchAppointments();
+    } else {
+      await this.fetchUserAppointments();
+    }
+  };
+
   fetchAppointments = async () => {
     try {
       const response = await axiosClient.get("/psychologists/get-appointments");
@@ -191,14 +238,24 @@ class Home extends React.Component {
   handleDateSelect = (selectInfo) => {
     let calendarApi = selectInfo.view.calendar;
     calendarApi.unselect(); // clear date selection
-
-    this.setState({
-      selectedEvent: null,
-      selectedDate: selectInfo.startStr,
-      selectedEnd: selectInfo.endStr,
-      allDay: selectInfo.allDay,
-      showAppointmentForm: true,
-    });
+    if (confirm("¿Desea bloquear la fecha seleccionada?")) {
+      calendarApi.addEvent({
+        title: "Bloqueado",
+        start: selectInfo.startStr,
+        end: selectInfo.endStr,
+        allDay: true,
+        display: "background", // Esto crea un evento de fondo
+        color: "#ff9f89", // Puedes personalizar el color de fondo aquí
+      });
+    } else {
+      this.setState({
+        selectedEvent: null,
+        selectedDate: selectInfo.startStr,
+        selectedEnd: selectInfo.endStr,
+        allDay: selectInfo.allDay,
+        showAppointmentForm: true,
+      });
+    }
   };
   handleEventDrop = async (info) => {
     const newStartTime = info.event.start.toISOString();
@@ -218,7 +275,7 @@ class Home extends React.Component {
         notes,
         price_cop,
         patient_id,
-        psychologist_id
+        psychologist_id,
       });
     } catch (error) {
       console.error("Error al actualizar la cita:", error);
@@ -356,7 +413,7 @@ class Home extends React.Component {
           notes: updatedData.notes,
           price_cop: updatedData.price_cop,
           patient_id: updatedData.patient.id,
-          psychologist_id: updatedData.psychologist.id
+          psychologist_id: updatedData.psychologist.id,
         }
       );
       this.setState({

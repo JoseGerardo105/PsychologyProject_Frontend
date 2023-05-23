@@ -34,7 +34,7 @@ const SearchPatient = () => {
   const search = () => {
     if (docToSearch !== "") {
       fetchPatient(docToSearch);
-    }else{
+    } else {
       fetchPatients();
     }
   };
@@ -81,11 +81,13 @@ const SearchPatient = () => {
 
   const fetchPatient = async (document) => {
     try {
-      const response = await axiosClient.get(`/psychologists/get-patient-with-doc/${document}`);
+      const response = await axiosClient.get(
+        `/psychologists/get-patient-with-doc/${document}`
+      );
       const patient = response.data;
       if (Object.keys(patient).length === 0) {
         throw error;
-      }else{
+      } else {
         setDatos([patient]);
       }
     } catch (error) {
@@ -105,42 +107,55 @@ const SearchPatient = () => {
     setValue(event.target.value);
   };
 
-
   const editPatient = async () => {
     try {
       switch (type) {
         case "Nombre":
-          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
-            name: value
-          });
+          await axiosClient.patch(
+            `/psychologists/update-patient/${idToModify}`,
+            {
+              name: value,
+            }
+          );
           break;
         case "Documento":
-          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
-            document_number: value
-          });
+          await axiosClient.patch(
+            `/psychologists/update-patient/${idToModify}`,
+            {
+              document_number: value,
+            }
+          );
           break;
         case "Email":
           if (/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
-            await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
-              email: value
-            });
-          }else{
+            await axiosClient.patch(
+              `/psychologists/update-patient/${idToModify}`,
+              {
+                email: value,
+              }
+            );
+          } else {
             throw error;
           }
           break;
         case "Telefono":
-          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
-            phone: value
-          });
+          await axiosClient.patch(
+            `/psychologists/update-patient/${idToModify}`,
+            {
+              phone: value,
+            }
+          );
           break;
         case "Direccion":
-          await axiosClient.patch(`/psychologists/update-patient/${idToModify}`, {
-            address: value
-          });
+          await axiosClient.patch(
+            `/psychologists/update-patient/${idToModify}`,
+            {
+              address: value,
+            }
+          );
           break;
         default:
           break;
-          
       }
       setAlerta({
         message: "Cambios guardados exitosamente.",
@@ -168,18 +183,18 @@ const SearchPatient = () => {
         Mis <span className="text-black">pacientes</span>
       </h1>
       <div className="float-right w-1/3 focus:outline-none py-2 px-4">
-    
-          <input
-            type="text"
-            placeholder="Buscar"
-            className=" border w-3/5 p-3  rounded-xl focus:ring-indigo-500 focus:border-indigo-500 mt-5 h-10"
-            onChange={(e) => setDocToSearch(e.target.value)}
-          />
-          <button
-            className="bg-black text-white my-5 mx-auto w-1/3 h-10 rounded-xl font-normal mt-5 hover:cursor-pointer hover:bg-gray-200 float-right"
-            onClick={() => search()}
-          >Buscar paciente</button>
-  
+        <input
+          type="text"
+          placeholder="Buscar"
+          className=" border w-3/5 p-3  rounded-xl focus:ring-indigo-500 focus:border-indigo-500 mt-5 h-10"
+          onChange={(e) => setDocToSearch(e.target.value)}
+        />
+        <button
+          className="bg-black text-white my-5 mx-auto w-1/3 h-10 rounded-xl font-normal mt-5 hover:cursor-pointer hover:bg-gray-200 float-right"
+          onClick={() => search()}
+        >
+          Buscar paciente
+        </button>
       </div>
 
       <table className="table-auto border rounded-xl w-full border-gray-400 px-4 py-2 bg-gray-100 text-gray-800 text-center text-base flex-col sm:flex-row">
@@ -278,7 +293,7 @@ const SearchPatient = () => {
           ))}
         </tbody>
       </table>
-      
+
       {showConfirmation && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow">
@@ -303,7 +318,6 @@ const SearchPatient = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

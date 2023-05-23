@@ -1,8 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import { makeStyles } from "@material-ui/core/styles";
+
 const styles = { fontFamily: "Oleo Script" };
 
+const useStyles = makeStyles({
+  icon: {
+    fontSize: "16rem",
+  },
+});
+
 function MyProfile() {
+  const classes = useStyles();
+
   return (
     <>
       <form
@@ -17,25 +27,34 @@ function MyProfile() {
             Mi <span className="text-black">perfil</span>
           </h1>
         </div>
-
-        <div>
-          <div className="my-10 mx-5">
-            <label className="text-black block text-xl font-bold">Nombre</label>
-            <input
-              type="text"
-              placeholder="Ejemplo"
-              className="border w-full p-3 mt-3 rounded-xl placeholder:text-black"
-              disabled
-            />
+        <div className="flex justify-between">
+          <div className="w-1/4">
+            <AccountCircleIcon className={classes.icon} />
           </div>
-          <div className="my-10 mx-5">
-            <label className="text-black block text-xl font-bold">Correo</label>
-            <input
-              type="email"
-              placeholder="ejemplo@ejemplo.com"
-              className="border w-full p-3 mt-3 rounded-xl  placeholder:text-black"
-              disabled
-            />
+
+          <div className="w-2/4">
+            <div className="my-10 mx-5">
+              <label className="text-black block text-xl font-bold">
+                Nombre
+              </label>
+              <input
+                type="text"
+                placeholder="Ejemplo"
+                className="border w-full p-3 mt-3 rounded-xl placeholder:text-black"
+                disabled
+              />
+            </div>
+            <div className="my-10 mx-5">
+              <label className="text-black block text-xl font-bold">
+                Correo
+              </label>
+              <input
+                type="email"
+                placeholder="ejemplo@ejemplo.com"
+                className="border w-full p-3 mt-3 rounded-xl  placeholder:text-black"
+                disabled
+              />
+            </div>
           </div>
         </div>
       </form>
