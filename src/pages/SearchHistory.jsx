@@ -9,6 +9,8 @@ const SearchHistory = () => {
   const [datos, setDatos] = useState([]);
   const [alerta, setAlerta] = useState({});
   const [docToSearch, setDocToSearch] = useState("");
+  const [showEraseConfirmation, setEraseConfirmation] = useState(false);
+  const [idErase, setIdErase] = useState("");
 
   const fetchPatient = async (patientId) => {
     try {
@@ -44,7 +46,9 @@ const SearchHistory = () => {
 
   const fetchMedicalRecByDocument = async (document) => {
     try {
-      const response = await axiosClient.get(`/psychologists/get-medical-record-with-doc/${document}`);
+      const response = await axiosClient.get(
+        `/psychologists/get-medical-record-with-doc/${document}`
+      );
       const medicalRecords = response.data;
       console.log(medicalRecords);
       for (let i = 0; i < medicalRecords.length; i++) {
@@ -52,7 +56,7 @@ const SearchHistory = () => {
         let patient = await fetchPatient(record.patientid);
         record.name = patient.name;
         record.document_number = patient.document_number;
-      } 
+      }
       setDatos(medicalRecords);
       return medicalRecords;
     } catch (error) {
@@ -81,8 +85,16 @@ const SearchHistory = () => {
   }, [alerta]);
 
   const deleteHistory = async (id) => {
+    setEraseConfirmation(true);
+    setIdErase(id);
+  };
+
+  const handleDelete = async () => {
     try {
-      await axiosClient.delete(`/psychologists/delete-medical-record/${id}`);
+      await axiosClient.delete(
+        `/psychologists/delete-medical-record/${idErase}`
+      );
+      setEraseConfirmation(false);
       fetchMedicalRecords();
       setAlerta({ message: "Historia eliminada exitosamente", err: false });
     } catch (error) {
@@ -101,12 +113,11 @@ const SearchHistory = () => {
   const search = () => {
     if (docToSearch !== "") {
       fetchMedicalRecByDocument(docToSearch);
-      console.log("Documento a buscar: " + docToSearch)
-    }else{
+      console.log("Documento a buscar: " + docToSearch);
+    } else {
       fetchMedicalRecords();
     }
   };
-
 
   const { message } = alerta;
 
@@ -162,6 +173,29 @@ const SearchHistory = () => {
           ))}
         </tbody>
       </table>
+      {showEraseConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded shadow">
+              <p className="mb-4">Seguro de que quiere borrar esta historia?</p>
+              <div className="flex justify-end">
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                  onClick={handleDelete}
+                >
+                  Sí
+                </button>
+                <button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={() => setEraseConfirmation(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

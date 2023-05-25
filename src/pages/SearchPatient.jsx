@@ -14,6 +14,7 @@ const SearchPatient = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [idErase, setIdErase] = useState("");
   const [docToSearch, setDocToSearch] = useState("");
+  const [showEditConfirmation, setEditConfirmation] = useState(false);
 
   useEffect(() => {
     fetchPatients();
@@ -47,7 +48,7 @@ const SearchPatient = () => {
 
   const edit = () => {
     setIsEditable(false);
-    editPatient();
+    setEditConfirmation(true);
   };
 
   const deletePatient = async (id) => {
@@ -58,6 +59,7 @@ const SearchPatient = () => {
   const handleDelete = async () => {
     try {
       await axiosClient.delete(`/psychologists/delete-patient/${idErase}`);
+      setShowConfirmation(false);
       fetchPatients();
       setAlerta({ message: "Paciente eliminado exitosamente", err: false });
     } catch (error) {
@@ -161,6 +163,7 @@ const SearchPatient = () => {
         message: "Cambios guardados exitosamente.",
         err: false,
       });
+      setEditConfirmation(false);
       fetchPatients();
     } catch (error) {
       setAlerta({
@@ -296,24 +299,49 @@ const SearchPatient = () => {
 
       {showConfirmation && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow">
-            <p className="mb-4">
-              Seguro de que quiere borrar el paciente? De la misma manera, todas
-              las citas e historias asociadas se eliminaran.
-            </p>
-            <div className="flex justify-end">
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
-                onClick={handleDelete}
-              >
-                Sí
-              </button>
-              <button
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-                onClick={() => setShowConfirmation(false)}
-              >
-                No
-              </button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded shadow">
+              <p className="mb-4">
+                Seguro de que quiere borrar el paciente? De la misma manera,
+                todas las citas e historias asociadas se eliminaran.
+              </p>
+              <div className="flex justify-end">
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                  onClick={handleDelete}
+                >
+                  Sí
+                </button>
+                <button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={() => setShowConfirmation(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showEditConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded shadow">
+              <p className="mb-4">Seguro de que quiere editar este paciente?</p>
+              <div className="flex justify-end">
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+                  onClick={editPatient}
+                >
+                  Sí
+                </button>
+                <button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={() => setEditConfirmation(false)}
+                >
+                  No
+                </button>
+              </div>
             </div>
           </div>
         </div>

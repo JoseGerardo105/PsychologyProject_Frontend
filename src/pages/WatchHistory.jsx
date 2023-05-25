@@ -18,6 +18,7 @@ const WatchHistory = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [type, setType] = useState("");
   const [value, setValue] = useState("");
+  const [showEditConfirmation, setEditConfirmation] = useState(false);
   const [alerta, setAlerta] = useState({});
 
   useEffect(() => {
@@ -40,6 +41,11 @@ const WatchHistory = () => {
     setIsEditable(true);
     setType(type);
     console.log(type);
+  };
+
+  const showEditMessage = () => {
+    setIsEditable(false);
+    setEditConfirmation(true);
   };
 
   const edit = async () => {
@@ -108,7 +114,11 @@ const WatchHistory = () => {
         message: "Cambios en la historia guardados exitosamente.",
         err: false,
       });
+      setEditConfirmation(false);
       fetchData();
+      if (type == "genero" || type == "estadociv") {
+        window.location.reload();
+      }
     } catch (error) {
       setAlerta({
         message: "Hubo un error en la edicion de la historia.",
@@ -146,9 +156,7 @@ const WatchHistory = () => {
   };
 
   useEffect(() => {
-    // if (datos.date_of_birth) {
-    //   setFecha(datos.date_of_birth.toString().substring(0, 10));
-    // }
+ 
     if (pac.name) {
       setNombre(pac.name);
     }
@@ -157,7 +165,7 @@ const WatchHistory = () => {
     }
     if (pac.date_of_birth) {
       let fecha = new Date(pac.date_of_birth);
-      let fechaFormateada = fecha.toLocaleDateString('es-ES');
+      let fechaFormateada = fecha.toLocaleDateString("es-ES");
       setFecha(fechaFormateada);
     }
   }, [datos, pac]);
@@ -185,7 +193,7 @@ const WatchHistory = () => {
               <div
                 className="bg-black rounded-xl p-2 cursor-pointer hover:bg-gray-600 float-left"
                 style={{ width: "fit-content" }}
-                onClick={() => edit()}
+                onClick={showEditMessage}
               >
                 <Save className="text-white block font-bold text-left text-2xl" />
               </div>
@@ -420,6 +428,29 @@ const WatchHistory = () => {
           </div>
         </form>
       </>
+      {showEditConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded shadow">
+              <p className="mb-4">Seguro de que quiere editar esta historia?</p>
+              <div className="flex justify-end">
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+                  onClick={edit}
+                >
+                  Sí
+                </button>
+                <button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={() => setEditConfirmation(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
