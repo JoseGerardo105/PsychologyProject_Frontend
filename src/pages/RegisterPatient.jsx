@@ -55,8 +55,8 @@ const RegisterPatient = () => {
     }
     if (!edad.trim()) {
       errorMessages.edad = "La fecha de nacimiento es obligatoria";
-    } else if (age < 18) {
-      errorMessages.age = "La edad mínima permitida es 18 años";
+    } else if (age < 5) {
+      errorMessages.age = "La edad mínima permitida es 5 años";
     }
     if (!email.trim()) {
       errorMessages.email = "El correo electrónico es obligatorio";

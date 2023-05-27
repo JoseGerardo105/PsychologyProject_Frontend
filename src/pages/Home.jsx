@@ -121,10 +121,13 @@ class Home extends React.Component {
   };
 
   fetchUserAppointments = async () => {
+    console.log(localStorage)
+
     try {
       const response = await axiosClient.get(
         "/psychologists/get-user-appointments"
       );
+      console.log(response)
       const appointments = response.data;
 
       // Usa appointments directamente para crear calendarEvents
@@ -158,16 +161,7 @@ class Home extends React.Component {
     }
   };
 
-  loadAppointments = async () => {
-    const userRole = localStorage.getItem("role");
-    if (userRole === "administrador") {
-      await this.fetchAppointments();
-    } else {
-      await this.fetchUserAppointments();
-    }
-  };
-
-  fetchAppointments = async () => {
+  fetchAdminAppointments = async () => {
     try {
       const response = await axiosClient.get("/psychologists/get-appointments");
       const appointments = response.data;
@@ -203,6 +197,16 @@ class Home extends React.Component {
       console.error("Error al obtener las citas:", error);
     }
   };
+
+  loadAppointments = async () => {
+    const userRole = localStorage.getItem("role");
+    if (userRole === "administrador") {
+      await this.fetchAdminAppointments();
+    } else {
+      await this.fetchUserAppointments();
+    }
+  };
+
   fetchPatients = async () => {
     try {
       const response = await axiosClient.get("/psychologists/get-patients");
