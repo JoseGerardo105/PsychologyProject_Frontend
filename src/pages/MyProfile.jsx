@@ -21,11 +21,12 @@ function MyProfile() {
   //Buscar el psicólogo por id
   const fetchUser = async () => {
     try {
+      console.log('hi',localStorage)
 
       if(localStorage.role === 'administrador'){
         setName("Administrador")
         setEmail("admin@admin.com")
-      } else if(localStorage.role === 'user'){
+      } else if(localStorage.role === 'usuario'){
         const response = await axiosClient.get(
           `/psychologists/get-a-psychologist/${localStorage.userEmail}`
         );
