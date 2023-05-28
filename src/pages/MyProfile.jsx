@@ -1,4 +1,5 @@
-import React from "react";
+import axiosClient from "../config/axios";
+import React, { useEffect, useState } from "react";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -9,8 +10,41 @@ const useStyles = makeStyles({
     fontSize: "16rem",
   },
 });
+console.log(localStorage)
 
 function MyProfile() {
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  
+  
+  //Buscar el psicólogo por id
+  const fetchUser = async () => {
+    try {
+
+      if(localStorage.role === 'administrador'){
+        setName("Administrador")
+        setEmail("admin@admin.com")
+      } else if(localStorage.role === 'user'){
+        const response = await axiosClient.get(
+          `/psychologists/get-a-psychologist/${localStorage.userEmail}`
+        );
+        const user = response.data[0];
+        setName(user.name)
+        setEmail(user.email)
+      }
+      
+      // return user;
+    } catch (error) {
+      console.error("Error al obtener el paciente:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+  
   const classes = useStyles();
 
   return (
@@ -39,7 +73,7 @@ function MyProfile() {
               </label>
               <input
                 type="text"
-                placeholder="Ejemplo"
+                placeholder={name}
                 className="border w-full p-3 mt-3 rounded-xl placeholder:text-black"
                 disabled
               />
@@ -50,7 +84,7 @@ function MyProfile() {
               </label>
               <input
                 type="email"
-                placeholder="ejemplo@ejemplo.com"
+                placeholder={email}
                 className="border w-full p-3 mt-3 rounded-xl  placeholder:text-black"
                 disabled
               />

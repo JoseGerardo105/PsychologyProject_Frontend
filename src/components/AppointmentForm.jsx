@@ -114,6 +114,7 @@ const AppointmentForm = ({
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+    // console.log(localStorage)
     let hasErrors = false;
     if (!psychologistId) {
       setPsychologistError("Por favor, selecciona un psicólogo.");

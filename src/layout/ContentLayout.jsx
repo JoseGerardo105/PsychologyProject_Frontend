@@ -185,7 +185,7 @@ const ContentLayout = () => {
                         {" "}
                         <Search />{" "}
                       </ListItemIcon>{" "}
-                      <ListItemText primary="Buscar Paciente" />{" "}
+                      <ListItemText primary="Pacientes citados" />{" "}
                     </ListItem>{" "}
                   </Link>
                 </nav>

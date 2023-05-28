@@ -27,9 +27,18 @@ const SearchHistory = () => {
 
   const fetchMedicalRecords = async () => {
     try {
-      const response = await axiosClient.get(
-        "/psychologists/get-medical-records"
+      let response = null;
+      if(localStorage.role === 'administrador'){
+        response = await axiosClient.get(
+        "/psychologists/get-admin-medical-records"
       );
+      } else if(localStorage.role === 'usuario') {
+        console.log(localStorage)
+        response = await axiosClient.get(
+          `/psychologists/get-psychologist-medical-records/${localStorage.userEmail}`
+        );
+      }
+      
       const medicalRecords = response.data;
       for (let record of medicalRecords) {
         let patient = await fetchPatient(record.patient_id);
@@ -133,7 +142,7 @@ const SearchHistory = () => {
       <div className="float-right w-1/3 focus:outline-none py-2 px-4">
         <input
           type="text"
-          placeholder="Buscar"
+          placeholder="Documento"
           className=" border w-3/5 p-3  rounded-xl focus:ring-indigo-500 focus:border-indigo-500 mt-5 h-10"
           onChange={(e) => setDocToSearch(e.target.value)}
         />

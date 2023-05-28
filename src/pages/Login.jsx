@@ -31,6 +31,8 @@ const Login = () => {
       localStorage.setItem("token", "admin-token"); // Puedes generar un token de administrador específico aquí
       localStorage.setItem("role", "administrador");
       localStorage.setItem("userId", "admin-id"); // Puedes asignar un ID de administrador específico aquí
+      localStorage.setItem("userEmail", 'admin@admin.com');
+
       setAlerta({ msg: "Inicio de sesión exitoso", err: false });
       navigate("/home");
       return;
@@ -46,6 +48,8 @@ const Login = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("role", "usuario"); // Establece el rol de usuarios normales como "usuario"
         localStorage.setItem("userId", response.data.id); // Asume que el ID del usuario se incluye en la respuesta del servidor
+        localStorage.setItem("userEmail", nombre);
+        console.log('hi',localStorage)
         setAlerta({ message: "Inicio de sesión exitoso", err: false });
         navigate("/home");
       } else {

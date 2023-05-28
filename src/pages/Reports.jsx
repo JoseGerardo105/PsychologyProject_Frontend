@@ -42,7 +42,7 @@ const Reports = () => {
   const fetchAdminAgeReport = async () => {
     try {
       const response = await axiosClient.get(
-        "/psychologists/get-patients-by-age"
+        "/psychologists/get-patients-by-age-admin"
       );
       const reports = response.data;
       setDatos(reports);

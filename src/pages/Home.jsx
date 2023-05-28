@@ -163,7 +163,7 @@ class Home extends React.Component {
 
   fetchAdminAppointments = async () => {
     try {
-      const response = await axiosClient.get("/psychologists/get-appointments");
+      const response = await axiosClient.get("/psychologists/get-admin-appointments");
       const appointments = response.data;
 
       const calendarEvents = appointments.map((appointment) => {
@@ -209,7 +209,7 @@ class Home extends React.Component {
 
   fetchPatients = async () => {
     try {
-      const response = await axiosClient.get("/psychologists/get-patients");
+      const response = await axiosClient.get("/psychologists/get-admin-patients");
       const patients = response.data;
       this.setState({ patients });
       return patients;
@@ -305,15 +305,19 @@ class Home extends React.Component {
       price_cop,
     } = formData;
     try {
-      await axiosClient.post("/psychologists/create-appointment", {
-        patient_id: patientId.id,
-        psychologist_id: psychologistId.id,
-        start_time: start,
-        end_time: end,
-        status: status,
-        notes: notes,
-        price_cop: price_cop,
-      });
+      console.log(localStorage)
+      // if(localStorage.role === 'administrador'){
+        await axiosClient.post("/psychologists/create-admin-appointment", {
+          patient_id: patientId.id,
+          psychologist_id: psychologistId.id,
+          start_time: start,
+          end_time: end,
+          status: status,
+          notes: notes,
+          price_cop: price_cop,
+        });
+      // }
+      
       this.setState({
         snackbarOpen: true,
         snackbarMessage: "Cita creada con éxito",

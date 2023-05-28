@@ -95,7 +95,8 @@ const CreateHistory = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await axiosClient.get("/psychologists/get-patients");
+      console.log(localStorage.userEmail)
+      const response = await axiosClient.get(`/psychologists/get-psychologist-patients/${localStorage.userEmail}`);
       const patients = response.data;
       console.log("Respuesta de la API ", response.data);
       setPatients(patients);

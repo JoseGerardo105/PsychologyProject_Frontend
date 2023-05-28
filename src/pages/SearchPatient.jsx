@@ -72,13 +72,28 @@ const SearchPatient = () => {
   };
 
   const fetchPatients = async () => {
-    try {
-      const response = await axiosClient.get("/psychologists/get-patients");
-      const patients = response.data;
-      setDatos(patients);
-    } catch (error) {
-      console.error("Error al obtener los pacientes:", error);
+    if (localStorage.role === "administrador") {
+      try {
+        const response = await axiosClient.get(
+          "/psychologists/get-admin-patients"
+        );
+        const patients = response.data;
+        setDatos(patients);
+      } catch (error) {
+        console.error("Error al obtener los pacientes:", error);
+      }
+    } else if(localStorage.role === "usuario"){
+      try {
+        const response = await axiosClient.get(
+          `/psychologists/get-psychologist-patients/${localStorage.userEmail}`
+        );
+        const patients = response.data;
+        setDatos(patients);
+      } catch (error) {
+        console.error("Error al obtener los pacientes:", error);
+      }
     }
+    console.log();
   };
 
   const fetchPatient = async (document) => {
@@ -185,10 +200,10 @@ const SearchPatient = () => {
       >
         Mis <span className="text-black">pacientes</span>
       </h1>
-      <div className="float-right w-1/3 focus:outline-none py-2 px-4">
+      <div className="float-right w-1/2 focus:outline-none py-2 px-4">
         <input
           type="text"
-          placeholder="Buscar"
+          placeholder="Documento"
           className=" border w-3/5 p-3  rounded-xl focus:ring-indigo-500 focus:border-indigo-500 mt-5 h-10"
           onChange={(e) => setDocToSearch(e.target.value)}
         />
