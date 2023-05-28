@@ -121,13 +121,13 @@ class Home extends React.Component {
   };
 
   fetchUserAppointments = async () => {
-    console.log(localStorage)
+    console.log(localStorage);
 
     try {
       const response = await axiosClient.get(
         "/psychologists/get-user-appointments"
       );
-      console.log(response)
+      console.log(response);
       const appointments = response.data;
 
       // Usa appointments directamente para crear calendarEvents
@@ -163,7 +163,9 @@ class Home extends React.Component {
 
   fetchAdminAppointments = async () => {
     try {
-      const response = await axiosClient.get("/psychologists/get-admin-appointments");
+      const response = await axiosClient.get(
+        "/psychologists/get-admin-appointments"
+      );
       const appointments = response.data;
 
       const calendarEvents = appointments.map((appointment) => {
@@ -209,7 +211,9 @@ class Home extends React.Component {
 
   fetchPatients = async () => {
     try {
-      const response = await axiosClient.get("/psychologists/get-admin-patients");
+      const response = await axiosClient.get(
+        "/psychologists/get-admin-patients"
+      );
       const patients = response.data;
       this.setState({ patients });
       return patients;
@@ -242,25 +246,38 @@ class Home extends React.Component {
   handleDateSelect = (selectInfo) => {
     let calendarApi = selectInfo.view.calendar;
     calendarApi.unselect(); // clear date selection
-    if (confirm("¿Desea bloquear la fecha seleccionada?")) {
-      calendarApi.addEvent({
-        title: "Bloqueado",
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: true,
-        display: "background", // Esto crea un evento de fondo
-        color: "#ff9f89", // Puedes personalizar el color de fondo aquí
-      });
-    } else {
-      this.setState({
-        selectedEvent: null,
-        selectedDate: selectInfo.startStr,
-        selectedEnd: selectInfo.endStr,
-        allDay: selectInfo.allDay,
-        showAppointmentForm: true,
-      });
-    }
+
+    this.setState({
+      selectedEvent: null,
+      selectedDate: selectInfo.startStr,
+      selectedEnd: selectInfo.endStr,
+      allDay: selectInfo.allDay,
+      showAppointmentForm: true,
+    });
   };
+  // handleDateSelect = (selectInfo) => {
+  //   let calendarApi = selectInfo.view.calendar;
+  //   calendarApi.unselect(); // clear date selection
+  //   if (confirm("¿Desea bloquear la fecha seleccionada?")) {
+  //     calendarApi.addEvent({
+  //       title: "Bloqueado",
+  //       start: selectInfo.startStr,
+  //       end: selectInfo.endStr,
+  //       allDay: true,
+  //       display: "background", // Esto crea un evento de fondo
+  //       color: "#ff9f89", // Puedes personalizar el color de fondo aquí
+  //     });
+  //   } else {
+  //     this.setState({
+  //       selectedEvent: null,
+  //       selectedDate: selectInfo.startStr,
+  //       selectedEnd: selectInfo.endStr,
+  //       allDay: selectInfo.allDay,
+  //       showAppointmentForm: true,
+  //     });
+  //   }
+  // };
+
   handleEventDrop = async (info) => {
     const newStartTime = info.event.start.toISOString();
     const newEndTime = info.event.end.toISOString();
@@ -305,19 +322,19 @@ class Home extends React.Component {
       price_cop,
     } = formData;
     try {
-      console.log(localStorage)
+      console.log(localStorage);
       // if(localStorage.role === 'administrador'){
-        await axiosClient.post("/psychologists/create-admin-appointment", {
-          patient_id: patientId.id,
-          psychologist_id: psychologistId.id,
-          start_time: start,
-          end_time: end,
-          status: status,
-          notes: notes,
-          price_cop: price_cop,
-        });
+      await axiosClient.post("/psychologists/create-admin-appointment", {
+        patient_id: patientId.id,
+        psychologist_id: psychologistId.id,
+        start_time: start,
+        end_time: end,
+        status: status,
+        notes: notes,
+        price_cop: price_cop,
+      });
       // }
-      
+
       this.setState({
         snackbarOpen: true,
         snackbarMessage: "Cita creada con éxito",

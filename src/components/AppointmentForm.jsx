@@ -63,6 +63,8 @@ const AppointmentForm = ({
 }) => {
   const classes = useStyles();
   const [userRole, setUserRole] = useState("");
+  const [creatingPsychologistEmail, setCreatingPsychologistEmail] =
+    useState("");
   const [patientId, setPatientId] = useState("");
   const [psychologistId, setPsychologistId] = useState("");
   const [status, setStatus] = useState("");
@@ -81,7 +83,13 @@ const AppointmentForm = ({
   useEffect(() => {
     console.log("selectedEvent en useEffect", selectedEvent);
     const role = localStorage.getItem("role");
+
+    if (role === "usuario") {
+      setCreatingPsychologistEmail(localStorage.getItem("userEmail"));
+    }
+
     setUserRole(role);
+    console.log(selectedEvent);
     if (selectedEvent) {
       setPatientId(selectedEvent.patient?.id || "");
       setPsychologistId(selectedEvent.psychologist?.id || "");
@@ -116,7 +124,7 @@ const AppointmentForm = ({
     e.preventDefault();
     // console.log(localStorage)
     let hasErrors = false;
-    if (!psychologistId) {
+    if (localStorage.role === "administrador" && !psychologistId) {
       setPsychologistError("Por favor, selecciona un psicólogo.");
       hasErrors = true;
     } else {
@@ -161,16 +169,32 @@ const AppointmentForm = ({
           start: dateTime,
           end: endDateTime,
           patient: patients.find((p) => p.id === patientId),
+
           psychologist: psychologists.find((p) => p.id === psychologistId),
+
           status,
           notes,
           price_cop,
         });
       } else {
+
         const newPatient = patients.find((p) => p.id === patientId);
-        const newPsychologist = psychologists.find(
-          (p) => p.id === psychologistId
-        );
+        console.log("holamundo");
+
+        let newPsychologist;
+        if (localStorage.role === "administrador") {
+          newPsychologist = psychologists.find(
+            (p) => p.id === psychologistId
+          );
+        } else if (localStorage.role === "usuario") {
+          newPsychologist = psychologists.find(
+            (p) => p.email === creatingPsychologistEmail
+          );
+        }
+
+        // const newPsychologist = psychologists.find(
+        //   (p) => p.id === psychologistId
+        // );
 
         onCreate({
           patientId: newPatient,
@@ -246,17 +270,30 @@ const AppointmentForm = ({
                 options={psychologists}
                 getOptionLabel={(option) => (option.id ? option.name : "")}
                 value={
-                  psychologists.find((p) => p.id === psychologistId) || null
+                  // psychologists.find((p) => p.id === psychologistId) || null
+                  userRole !== "usuario"
+                    ? psychologists.find((p) => p.id === psychologistId) || null
+                    : psychologists.find(
+                        (p) => p.email === creatingPsychologistEmail
+                      ) || null
                 }
                 onChange={(event, newValue) => {
+                  // if (userRole !== "usuario") {
+                  console.log(newValue);
                   setPsychologistId(newValue ? newValue.id : null);
                   if (newValue) {
                     setPsychologistError("");
+                    // }
                   }
                 }}
                 renderInput={(params) => (
-                  <TextField {...params} label="Psicólogo" variant="outlined" />
+                  <TextField
+                    {...params}
+                    label={userRole === "usuario" ? "" : "Psicólogo"}
+                    variant="outlined"
+                  />
                 )}
+                disabled={userRole === "usuario"} // Bloquear el input cuando userRole es "usuario"
               />
             )}
             {psychologistError && (
