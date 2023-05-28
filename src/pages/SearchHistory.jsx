@@ -33,7 +33,6 @@ const SearchHistory = () => {
         "/psychologists/get-admin-medical-records"
       );
       } else if(localStorage.role === 'usuario') {
-        console.log(localStorage)
         response = await axiosClient.get(
           `/psychologists/get-psychologist-medical-records/${localStorage.userEmail}`
         );
@@ -59,7 +58,6 @@ const SearchHistory = () => {
         `/psychologists/get-medical-record-with-doc/${document}`
       );
       const medicalRecords = response.data;
-      console.log(medicalRecords);
       for (let i = 0; i < medicalRecords.length; i++) {
         let record = medicalRecords[i];
         let patient = await fetchPatient(record.patientid);
@@ -122,7 +120,6 @@ const SearchHistory = () => {
   const search = () => {
     if (docToSearch !== "") {
       fetchMedicalRecByDocument(docToSearch);
-      console.log("Documento a buscar: " + docToSearch);
     } else {
       fetchMedicalRecords();
     }

@@ -95,15 +95,13 @@ const CreateHistory = () => {
 
   const fetchPatients = async () => {
     try {
-      console.log(localStorage.userEmail)
       const response = await axiosClient.get(`/psychologists/get-psychologist-patients/${localStorage.userEmail}`);
       const patients = response.data;
-      console.log("Respuesta de la API ", response.data);
       setPatients(patients);
 
       return patients;
     } catch (error) {
-      console.error("Error al obtener los pacientes:", error);
+      console.error('error',error);
     }
   };
   useEffect(() => {
@@ -163,7 +161,6 @@ const CreateHistory = () => {
                   onChange={(event, newValue) => {
                     const fechaNacimiento = new Date(newValue.date_of_birth);
                     const fechaFormateada = fechaNacimiento.toISOString().slice(0, 10);
-                    console.log(fechaFormateada)
                     setPatientId(newValue ? newValue.id : null);
                     setDoc(newValue ? newValue.document_number : "");
                     setEdad(newValue ? fechaFormateada : "");

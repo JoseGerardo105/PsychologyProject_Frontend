@@ -28,19 +28,13 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(nombre);
-    console.log(email);
-    console.log(password);
-    console.log(repetirPassword);
     if ([nombre, email, password, repetirPassword].includes("")) {
       setAlerta({ message: "Hay valores vacios", err: true });
-      console.log("Hay valores vacios");
       return;
     }
 
     if (password !== repetirPassword) {
       setAlerta({ message: "Las contraseñas no coinciden. ", err: true });
-      console.log("Las contraseñas no coinciden.");
       return;
     }
     if (password.length < 8) {
@@ -62,12 +56,10 @@ const Register = () => {
 
       if (response.data.message) {
         setAlerta({ message: "Cuenta creada exitosamente revisa tu email para confirmar registro" , err: false});
-        // navigate("/");
       } else {
         setAlerta({ message: "Error al crear cuenta" , err: true});
       }
     } catch (error) {
-      console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico del back
         setAlerta({ message: error.response.data.error });

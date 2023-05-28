@@ -81,7 +81,6 @@ const AppointmentForm = ({
       : selectedEnd || new Date().toISOString()
   );
   useEffect(() => {
-    console.log("selectedEvent en useEffect", selectedEvent);
     const role = localStorage.getItem("role");
 
     if (role === "usuario") {
@@ -89,7 +88,6 @@ const AppointmentForm = ({
     }
 
     setUserRole(role);
-    console.log(selectedEvent);
     if (selectedEvent) {
       setPatientId(selectedEvent.patient?.id || "");
       setPsychologistId(selectedEvent.psychologist?.id || "");
@@ -122,7 +120,6 @@ const AppointmentForm = ({
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    // console.log(localStorage)
     let hasErrors = false;
     if (localStorage.role === "administrador" && !psychologistId) {
       setPsychologistError("Por favor, selecciona un psicólogo.");
@@ -179,7 +176,6 @@ const AppointmentForm = ({
       } else {
 
         const newPatient = patients.find((p) => p.id === patientId);
-        console.log("holamundo");
 
         let newPsychologist;
         if (localStorage.role === "administrador") {
@@ -191,10 +187,6 @@ const AppointmentForm = ({
             (p) => p.email === creatingPsychologistEmail
           );
         }
-
-        // const newPsychologist = psychologists.find(
-        //   (p) => p.id === psychologistId
-        // );
 
         onCreate({
           patientId: newPatient,
@@ -279,7 +271,6 @@ const AppointmentForm = ({
                 }
                 onChange={(event, newValue) => {
                   // if (userRole !== "usuario") {
-                  console.log(newValue);
                   setPsychologistId(newValue ? newValue.id : null);
                   if (newValue) {
                     setPsychologistError("");

@@ -40,7 +40,6 @@ const WatchHistory = () => {
   const enableEdition = (type) => {
     setIsEditable(true);
     setType(type);
-    console.log(type);
   };
 
   const showEditMessage = () => {

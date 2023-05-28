@@ -93,7 +93,6 @@ const SearchPatient = () => {
         console.error("Error al obtener los pacientes:", error);
       }
     }
-    console.log();
   };
 
   const fetchPatient = async (document) => {

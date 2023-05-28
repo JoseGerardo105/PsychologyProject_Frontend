@@ -10,7 +10,6 @@ const useStyles = makeStyles({
     fontSize: "16rem",
   },
 });
-console.log(localStorage)
 
 function MyProfile() {
 
@@ -21,8 +20,6 @@ function MyProfile() {
   //Buscar el psicólogo por id
   const fetchUser = async () => {
     try {
-      console.log('hi',localStorage)
-
       if(localStorage.role === 'administrador'){
         setName("Administrador")
         setEmail("admin@admin.com")
@@ -37,7 +34,6 @@ function MyProfile() {
       
       // return user;
     } catch (error) {
-      console.error("Error al obtener el paciente:", error);
       return null;
     }
   };

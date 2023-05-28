@@ -49,14 +49,12 @@ const Login = () => {
         localStorage.setItem("role", "usuario"); // Establece el rol de usuarios normales como "usuario"
         localStorage.setItem("userId", response.data.id); // Asume que el ID del usuario se incluye en la respuesta del servidor
         localStorage.setItem("userEmail", nombre);
-        console.log('hi',localStorage)
         setAlerta({ message: "Inicio de sesión exitoso", err: false });
         navigate("/home");
       } else {
         setAlerta({ message: "Error al iniciar sesión", err: true });
       }
     } catch (error) {
-      console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico desde el backend
         setAlerta({ message: error.response.data.error, err: true });

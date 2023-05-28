@@ -14,7 +14,6 @@ const Reports = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    console.log(localStorage)
     setSalary(0);
     if(localStorage.role === 'usuario'){
       fetchPsychologistAgeReport();
@@ -30,7 +29,6 @@ const Reports = () => {
     } else {
       // Lógica para generar el reporte
       if(localStorage.role === 'usuario'){
-        console.log('holas')
         fetchPsychologistIcomeReport();
       } else if (localStorage.role === 'administrador'){
         fetchAdminIcomeReport();
@@ -92,7 +90,6 @@ const Reports = () => {
       const response = await axiosClient.get(
         `/psychologists/get-income-by-appointments-psychologist?start_date=${startDate}&end_date=${endDate}&psychologist_email=${email}`
       );
-      console.log(response);
       const reports = response.data[0].totalIncomeSum;
       setSalary(reports);
     } catch (error) {
@@ -101,7 +98,6 @@ const Reports = () => {
   };
 
   const countValues = datos.map((item) => item.count);
-  console.log(countValues);
 
   const pacientesPorEdad = countValues;
   // const ingresosGenerales = ;

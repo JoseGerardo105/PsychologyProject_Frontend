@@ -46,7 +46,6 @@ const MailForPassword = () => {
         setAlerta({ message: "Error al enviar las instrucciones"});
       }
     } catch (error) {
-      console.log(error);
       if (error.response && error.response.data) {
         // Muestra un mensaje de error específico desde el backend
         setAlerta({ message: error.response.data.error, err:true });

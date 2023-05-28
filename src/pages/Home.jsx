@@ -121,13 +121,11 @@ class Home extends React.Component {
   };
 
   fetchUserAppointments = async () => {
-    console.log(localStorage);
 
     try {
       const response = await axiosClient.get(
         "/psychologists/get-user-appointments"
       );
-      console.log(response);
       const appointments = response.data;
 
       // Usa appointments directamente para crear calendarEvents
@@ -322,7 +320,6 @@ class Home extends React.Component {
       price_cop,
     } = formData;
     try {
-      console.log(localStorage);
       // if(localStorage.role === 'administrador'){
       await axiosClient.post("/psychologists/create-admin-appointment", {
         patient_id: patientId.id,
@@ -376,7 +373,6 @@ class Home extends React.Component {
         snackbarSeverity: "success",
       });
     } catch (error) {
-      console.error("Error al eliminar la cita:", error);
       this.setState({
         snackbarOpen: true,
         snackbarMessage: "Error al eliminar la cita:",
@@ -389,39 +385,7 @@ class Home extends React.Component {
     event.remove();
   };
 
-  // handleUpdateAppointment = async (selectedEvent, updatedData) => {
-  //   const eventId = selectedEvent.id;
-  //   console.log(updatedData)
-  //   try {
-  //     await axiosClient.patch(`/psychologists/update-appointment/${eventId}`, {
-  //       start_time: updatedData.start,
-  //       end_time: updatedData.end,
-  //       status: updatedData.status,
-  //       notes: updatedData.notes,
-  //       price_cop: updatedData.price_cop,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error al actualizar la cita:", error);
-  //     this.setState({
-  //       snackbarOpen: true,
-  //       snackbarMessage: "Error al actualizar la cita:",
-  //       snackbarSeverity: "error",
-  //     });
-  //   }
-  //   const calendarApi = this.calendarRef.current.getApi();
-  //   selectedEvent.setProp(
-  //     "title",
-  //     `Cita con paciente ${updatedData.patient.name}`
-  //   );
-  //   selectedEvent.setStart(updatedData.start);
-  //   selectedEvent.setEnd(updatedData.end);
-  //   selectedEvent.setExtendedProp("status", updatedData.status);
-  //   selectedEvent.setExtendedProp("notes", updatedData.notes);
-  //   selectedEvent.setExtendedProp("price_cop", updatedData.price_cop);
-  //   calendarApi.updateEvent(selectedEvent);
-  // };
-
-  handleUpdateAppointmentWithButton = async (updatedData) => {
+handleUpdateAppointmentWithButton = async (updatedData) => {
     const eventId = updatedData?.id;
     if (!eventId) {
       console.error("No se pudo encontrar el ID del evento");
