@@ -321,7 +321,7 @@ class Home extends React.Component {
     } = formData;
     try {
       // if(localStorage.role === 'administrador'){
-      await axiosClient.post("/psychologists/create-admin-appointment", {
+      await axiosClient.post("/psychologists/create-appointment", {
         patient_id: patientId.id,
         psychologist_id: psychologistId.id,
         start_time: start,
