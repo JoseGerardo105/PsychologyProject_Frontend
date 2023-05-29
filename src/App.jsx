@@ -27,7 +27,10 @@ function App() {
           <Route index element={<Login />} />{" "}
           <Route path="register" element={<Register />} />{" "}
           <Route path="restore-account" element={<MailForPassword />} />{" "}
-          <Route path="restore-account/:token" element={<ResetPasswordForEnter />} />{" "}
+          <Route
+            path="restore-account/:token"
+            element={<ResetPasswordForEnter />}
+          />{" "}
           <Route path="confirm-account/:token" element={<ConfirmAccount />} />{" "}
         </Route>{" "}
         <Route path="/home" element={<ContentLayout />}>
